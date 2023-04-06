@@ -8,83 +8,92 @@
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
-library(mice)
-library(qgcomp)
-library(psych)
-library(quantreg)
+
+# Set Working Directory
+setwd("~/Johns Hopkins/PAIR Data - Documents/Data/Current/")
 
 ##### Read Data ################################################################
 pregtrak <- read_csv("j7pregtrak/pair_pregtrak_2022_0309.csv")
 water_pe <- read_csv("assay_water_metals/pair_watermetals_pef_2022_1030.csv")
 water_vx <- read_csv("assay_water_metals/pair_watermetals_vaxf_2022_1030.csv")
 
-##### Prepare Data ##########################################
-# Goal: Prepare two data sets, both with 784 rows and 23 elements, one with 
-# values <LLOD set to NA and one with values <LLOD set to LLOD/√2. If supported
-# by intra-class correlation analyses, use data from Visit 2 where data from
-# Visit 1 are missing due to laboratory problems.
+# Reset Working Directory
+setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 
-# Combine Data
-df <- pregtrak %>%
+##### Select Data ##############################################################
+# PREGTRAK
+df_water <- pregtrak %>%
   filter(PEF == 1 & PEFSST == 1) %>%
-  select(UID)
+  select(UID, PEFSST, VAXFSST)
 
+# Drinking Water Elements: PEF
 water_pe <- water_pe %>%
   mutate(UID = as.numeric(UID)) %>%
   select(UID, starts_with("PE_wMetals_"))
 
+# Drinking Water Elements: VAXF
 water_vx <- water_vx %>%
   mutate(UID = as.numeric(UID)) %>%
   select(UID, starts_with("VX_wMetals_"))
 
-df <- left_join(df, water_pe, by = "UID")
-df <- left_join(df, water_vx, by = "UID")
+##### Join Data ################################################################
+df_water <- left_join(df_water, water_pe, by = "UID")
+df_water <- left_join(df_water, water_vx, by = "UID")
 
-# Summarize Values <LLOD
+df_water %>% head()
 
-# Summarize Outliers
+# Remove Source Data
+rm(list = c("pregtrak","water_pe","water_vx"))
 
-# Calculate Intra-class Correlation Coefficients
+##### Select Elements (1) ######################################################
+# Exclude Elements with Mass Drift (K, Mg, Na)
+df_water <- df_water %>%
+  select(-c(contains("_K"), contains("_Mg"), contains("_Na")))
 
-##### Strategy 1: Multiple Imputation ##########################################
-# Set Parameters
-m <- 50
-i <- 1
+# List Included Drinking Water Elements
+df_water %>%
+  select(starts_with("PE_wMetals_")) %>%
+  select(-ends_with("_LTLOD")) %>%
+  colnames() %>%
+  gsub("PE_wMetals_","", .) %>%
+  sort()
 
-# Multiply Impute Values
-df_mice_impt <- mice(df_mice_miss, m = m, maxit = i, method = "leftcenslognorm")
+##### Summarize True Missingness ###############################################
+# Visit 1
+df_water %>%
+  count(PEFSST == 1)
 
-# Calculate Correlation Matrices
-df_mice_comp <- complete(df_mice_impt, action = "long")
+df_water %>%
+  select(starts_with("PE_")) %>%
+  select(-ends_with("_LTLOD")) %>%
+  sapply(function(x) sum(is.na(x)))
 
-# Calculate Mean Correlation Matrix
+# Visit 2
+df_water %>%
+  count(VAXFSST == 1)
 
-# Generate Scree Plot
+df_water %>%
+  select(starts_with("VX_")) %>%
+  select(-ends_with("_LTLOD")) %>%
+  sapply(function(x) sum(is.na(x)))
 
-# Run Principal Components Analysis
+##### Keep Complete Cases at Visit 1 ###########################################
+df_water <- df_water %>%
+  filter(!is.na(PE_wMetals_As))
 
-##### Strategy 2: Constant #####################################################
-# Calculate Correlation Matrix
+##### Summarize Values <LLOD ###################################################
+df_water %>%
+  select(starts_with("PE_wMetals_")) %>%
+  select(ends_with("_LTLOD")) %>%
+  rename_with(~ gsub("PE_wMetals_","", .x)) %>%
+  rename_with(~ gsub("_LTLOD","",.x)) %>%
+  sapply(function(x) sum(x)) %>%
+  as_tibble(rownames = "ELEMENT") %>%
+  mutate(p = value / nrow(df_water) * 100) %>%
+  mutate(group = ifelse(p < 10, 1, ifelse(p >= 10 & p < 30, 2, ifelse(p >= 30 & p < 50, 3, 4)))) %>%
+  arrange(group, ELEMENT)
 
-# Generate Scree Plot
-
-# Run Principal Components Analysis
-
-##### Compare Strategies #######################################################
-# Compare Correlation Matrices
-# Compare Scree Plots
-# Compare Loadings
-
-##### Quantile Regression ######################################################
-tau <- c(0.10,0.25,0.50,0.75,0.90)
-
-##### Tables and Figures #######################################################
-# Table 1: Participant Characteristics by Drinking Water Arsenic Standards
-# Table 2: Drinking Water Elements
-# Figure 1: Principal Component Loadings
-# Figure 2: Quantile Regression by Drinking Water Arsenic Standards
-
-# Figure S1: Correlation Matrix (Multiple Imputation)
-# Figure S2: Correlation Matrix (LLOD/√2)
-# Figure S3: Principal Component Loadings (LLOD/√2)
-# Figure S4: Density 
+##### Select Elements (2) ######################################################
+# Exclude Elements with >50% of Values <LLOD (Cd, Cu, Pb, Zn)
+df_water <- df_water %>%
+  select(-c(contains("_Cd"), contains("_Cu"), contains("_Pb"), contains("_Zn")))

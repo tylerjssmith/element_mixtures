@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Load Functions
+# Identify Element Mixtures -- Table 2
 
 # Tyler Smith
 # April 4, 2023
@@ -9,4 +9,4 @@
 # Load Packages
 library(tidyverse)
 
-##### Load Plot Themes #########################################################
+##### Generate Table 2 #########################################################
