@@ -82,18 +82,20 @@ df_water <- df_water %>%
   filter(!is.na(PE_wMetals_As))
 
 ##### Summarize Values <LLOD ###################################################
-df_water %>%
+llod_water <- df_water %>%
   select(starts_with("PE_wMetals_")) %>%
   select(ends_with("_LTLOD")) %>%
   rename_with(~ gsub("PE_wMetals_","", .x)) %>%
   rename_with(~ gsub("_LTLOD","",.x)) %>%
   sapply(function(x) sum(x)) %>%
   as_tibble(rownames = "ELEMENT") %>%
-  mutate(p = value / nrow(df_water) * 100) %>%
-  mutate(group = ifelse(p < 10, 1, ifelse(p >= 10 & p < 30, 2, ifelse(p >= 30 & p < 50, 3, 4)))) %>%
-  arrange(group, ELEMENT)
+  rename(n = value) %>%
+  mutate(p = n / nrow(df_water) * 100) %>%
+  mutate(CATEGORY = ifelse(p < 10, 1, ifelse(p >= 10 & p < 30, 2, ifelse(p >= 30 & p < 50, 3, 4)))) %>%
+  arrange(CATEGORY, ELEMENT)
 
 ##### Select Elements (2) ######################################################
 # Exclude Elements with >50% of Values <LLOD (Cd, Cu, Pb, Zn)
 df_water <- df_water %>%
   select(-c(contains("_Cd"), contains("_Cu"), contains("_Pb"), contains("_Zn")))
+

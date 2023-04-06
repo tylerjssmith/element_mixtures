@@ -19,6 +19,7 @@ pefsst   <- read_csv("pefsst/pair_pefsst_2022_0310.csv")
 parity   <- read_csv("pair_reprohistory/pair_reprohistory_2022_0328.csv")
 ses      <- read_csv("ses/pair_ses_2022_0310.csv")
 pef      <- read_csv("pef/pair_pef_2022_0310.csv")
+uasb     <- read_csv("assay_urinary_metals/pair_urinaryarsenic_2022_1029.csv")
 
 # Reset Working Directory
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
@@ -65,14 +66,22 @@ pef <- pef %>%
     PEHCIGAR
   )
 
+# Urinary Arsenobetaine
+uasb <- uasb %>%
+  select(
+    UID,
+    uAsB = PE_uAs_Ab_SG
+  )
+
 ##### Join Data ################################################################
 df_covar <- left_join(pregtrak, pefsst, by = "UID")
 df_covar <- left_join(df_covar, parity, by = "UID")
 df_covar <- left_join(df_covar, ses, by = "UID")
 df_covar <- left_join(df_covar, pef, by = "UID")
+df_covar <- left_join(df_covar, uasb, by = "UID")
 
 # Remove Source Data
-rm(list = c("pregtrak","pefsst","parity","ses","pef"))
+rm(list = c("pregtrak","pefsst","parity","ses","pef","uasb"))
 
 ##### Prepare Data #############################################################
 # Age
@@ -107,7 +116,7 @@ df_covar <- df_covar %>%
 
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, PETOBAC, PEBETEL, PEHCIGAR)
+  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, PETOBAC, PEBETEL, PEHCIGAR, uAsB)
 
 df_covar %>% head()
 

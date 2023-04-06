@@ -27,6 +27,8 @@ source("01E_setup_data_covar.R")
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 
 # 02A Exploratory Data Analysis
+source("02A_explore.R")
+
 # 02B Multiple Imputation
 # 02C Principal Component Analyses
 # 02D Quantile Regression
