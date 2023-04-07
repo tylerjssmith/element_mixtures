@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Table 2
+# Identify Element Mixtures -- Table 1
 
 # Tyler Smith
 # April 4, 2023

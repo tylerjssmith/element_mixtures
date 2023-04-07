@@ -30,32 +30,47 @@ setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 source("02A_explore.R")
 
 # 02B Multiple Imputation
+source("02B_mice.R")
+
 # 02C Principal Component Analyses
+source("02C_pca.R")
+
 # 02D Quantile Regression
+source("02D_quantreg.R")
 
 ##### 03 Tables and Figures ####################################################
 # 03A Table 1 (Drinking Water Elements)
+source("03A_table1.R")
 
 # 03B Table 2 (Participant Characteristics)
 source("03B_table2.R")
 
-# 03C Figure 1 (Loadings/Multiple Imputation)
+# 03C Figure 1 (Loadings)
+source("03C_fig1.R")
 
-# 03D Figure 2 (Quantile Regression/Multiple Imputation)
+# 03D Figure 2 (Quantile Regression)
+source("03D_fig2.R")
 
 ##### 04 Supplementary Tables and Figures ######################################
+# 04A Table S1 (Urinary Elements)
+source("04A_tblS1.R")
 
+# 04B Table S2 (Spearman's Correlations)
+source("04B_tblS2.R")
 
+# 04C Figure S1 (Density Plots)
+source("04C_figS1.R")
 
-# 04A Figure S1 (Density Plots)
-# 04B Figure S2 (Box Plots)
-# 04A Figure S2 (Correlations)
-# 04B Figure S3 (Scree Plot)
+# 04D Figure S2 (Box Plots)
+source("04D_figS2.R")
 
+# 04E Figure S3 (Correlations)
+source("04C_figS3.R")
 
+# 04F Figure S4 (Scree Plot)
+source("04D_figS4.R")
 
-
-
+##### Export Figures ###########################################################
 
 
 
