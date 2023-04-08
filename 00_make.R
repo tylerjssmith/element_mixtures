@@ -51,7 +51,7 @@ source("03C_fig1.R")
 # 03D Figure 2 (Quantile Regression)
 source("03D_fig2.R")
 
-##### 04 Supplementary Tables and Figures ######################################
+##### 04 Supplemental Tables and Figures #######################################
 # 04A Table S1 (Urinary Elements)
 source("04A_tblS1.R")
 
