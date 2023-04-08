@@ -11,7 +11,7 @@ library(tidyverse)
 
 ##### Generate Figure ##########################################################
 # Extract Eigenvalues
-figS3_eigenvalues <- pca_fit_full$values %>%
+figS3_eigenvalues <- pca_fit$values %>%
   as_tibble(rownames = "PC") %>%
   mutate(PC = as.numeric(PC))
 
