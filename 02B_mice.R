@@ -11,42 +11,55 @@ library(tidyverse)
 library(mice)
 library(qgcomp)
 
-##### Set Values <LLOD to Missing ##############################################
-tmp1 <- df_water %>%
-  rename_with(~ gsub("PE_wMetals_", "", .x)) %>%
-  pivot_longer(-UID, names_to = "ELEMENT", values_to = "VALUE")
-
-tmp2 <- ltllod_water %>%
-  rename_with(~ gsub("PE_wMetals_", "", .x)) %>%
-  rename_with(~ gsub("_LTLOD", "", .x)) %>%
-  pivot_longer(-UID, names_to = "ELEMENT", values_to = "LTLOD")
-
-tmp1 <- left_join(tmp1, tmp2, by = c("UID","ELEMENT"))
-
-tmp1 %>% head()
-
-tmp1 <- tmp1 %>%
-  mutate(VALUE = ifelse(LTLOD == 1, NA, VALUE)) %>%
-  pivot_wider(id_cols = UID, names_from = ELEMENT, values_from = VALUE)
-
-tmp1 %>% head()
-
-tmp1 %>% sapply(function(x) sum(is.na(x)))
+##### Check Data ###############################################################
+df_water_missing %>% head()
+df_water_missing %>% sapply(function(x) sum(is.na(x)))
 
 ##### Implement MICE ###########################################################
-# Predictor Matrix
+# Imputations (m)
+m <- 5
+
+# Iterations (maxit)
+i <- 5
+
+# Predictor Matrix (predictorMatrix)
 mice_predictors <- matrix(1, 17, 17)
 mice_predictors[,1] <- mice_predictors[1,] <- 0
 
-tmp3 <- read_csv("~/Johns Hopkins/PAIR Data - Documents/Data/Current/assay_water_metals/pair_watermetals_llod_2022_1030.csv")
+# Limits of Detection (lod -- passed to mice.impute.leftcenslognorm())
+lod <- left_join(tibble(ELEMENT = colnames(df_water_missing)), water_llod, by = "ELEMENT")
 
-llod <- left_join(tibble(ELEMENT = colnames(tmp1)), tmp3, by = "ELEMENT")
-llod <- llod %>% pull(LLOD)
+# (Test Number of Limits of Detection)
+if(length(lod %>% pull(ELEMENT)) != length(colnames(df_water_missing))) stop("check lod -- number")
+
+# (Test Order of Limits of Detection)
+if(sum(lod %>% pull(ELEMENT) != colnames(df_water_missing)) == length(lod %>% pull(ELEMENT))) stop("check lod -- order")
+
+lod <- lod %>% pull(LLOD)
 
 # Run MICE
-impt <- mice(tmp1, m = 5, maxit = 1, method = "leftcenslognorm", predictorMatrix = mice_predictors, lod = llod)
+impt <- mice(df_water_missing, m = m, maxit = i, method = "leftcenslognorm", 
+  predictorMatrix = mice_predictors, lod = lod)
+
+# Check Logged Events
+impt$loggedEvents
 
 ##### Check Imputations ########################################################
+df_water_missing %>% sapply(function(x) sum(is.na(x)))
+
+check_impt(data_cons = df_water, data_mi = impt, element = Al)
+check_impt(data_cons = df_water, data_mi = impt, element = As)
+check_impt(data_cons = df_water, data_mi = impt, element = Br)
+check_impt(data_cons = df_water, data_mi = impt, element = Fe)
+check_impt(data_cons = df_water, data_mi = impt, element = Mo)
+check_impt(data_cons = df_water, data_mi = impt, element = P)
+check_impt(data_cons = df_water, data_mi = impt, element = S)
+check_impt(data_cons = df_water, data_mi = impt, element = Sb)
+check_impt(data_cons = df_water, data_mi = impt, element = U)
+check_impt(data_cons = df_water, data_mi = impt, element = V)
+check_impt(data_cons = df_water, data_mi = impt, element = W)
+
+
 
 
 
