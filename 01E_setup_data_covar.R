@@ -61,6 +61,8 @@ ses <- ses %>%
 pef <- pef %>%
   select(
     UID,
+    PEMIXPEST,
+    PESPRAYPEST,
     PETOBAC,
     PEBETEL,
     PEHCIGAR
@@ -80,6 +82,8 @@ df_covar <- left_join(df_covar, ses, by = "UID")
 df_covar <- left_join(df_covar, pef, by = "UID")
 df_covar <- left_join(df_covar, uasb, by = "UID")
 
+df_covar %>% head()
+
 # Remove Source Data
 rm(list = c("pregtrak","pefsst","parity","ses","pef","uasb"))
 
@@ -88,35 +92,75 @@ rm(list = c("pregtrak","pefsst","parity","ses","pef","uasb"))
 df_covar <- df_covar %>%
   mutate(AGE = year(SEDATE) - DOBYY)
 
+df_covar %>%
+  check_continuous(
+    x = AGE, 
+    xlab = "Age (years)", 
+    title = "Age"
+  )
+
 # Gestational Age
 df_covar <- df_covar %>%
   mutate(SEGSTAGE = SEWKINT - BGLMPWK)
+
+df_covar %>%
+  check_discrete(SEGSTAGE)
 
 # Parity
 df_covar <- df_covar %>%
   mutate(PARITY = ifelse(PARITY > 2, 2, PARITY))
 
+df_covar %>%
+  check_discrete(PARITY)
+
 # Education
 df_covar <- df_covar %>%
   mutate(EDUCATION = ifelse(EDUCATION > 2, 2, EDUCATION))
 
+df_covar %>%
+  check_discrete(EDUCATION)
+
 # Living Standards Index
+df_covar %>%
+  check_continuous(
+    x = LSI, 
+    xlab = "Living Standards Index", 
+    title = "Living Standards Index"
+  )
 
-# Maternal Occupation
+# Pesticide Use
+df_covar <- df_covar %>%
+  mutate(PESTICIDE = ifelse(PEMIXPEST == 1 | PESPRAYPEST == 1, 1, 0))
 
-# Paternal Occupation
+df_covar %>%
+  check_discrete(PEMIXPEST)
+df_covar %>%
+  check_discrete(PESPRAYPEST)
+df_covar %>%
+  check_discrete(PESTICIDE)
 
 # Chewing Tobacco
 df_covar <- df_covar %>%
   mutate(PETOBAC = as.numeric(PETOBAC))
 
+df_covar %>%
+  check_discrete(PETOBAC)
+
 # Betel Nut
+df_covar %>%
+  check_discrete(PEBETEL)
 
 # Husband's Smoking
+df_covar %>%
+  check_discrete(PEHCIGAR)
 
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, PETOBAC, PEBETEL, PEHCIGAR, uAsB)
+  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, PESTICIDE, PETOBAC, 
+    PEBETEL, PEHCIGAR, uAsB)
+
+df_covar %>%
+  sapply(function(x) sum(is.na(x)))
 
 df_covar %>% head()
 

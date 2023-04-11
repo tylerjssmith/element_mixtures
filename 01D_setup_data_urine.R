@@ -35,9 +35,13 @@ urine_element <- urine_element %>%
   select(UID, ends_with("_SG") | ends_with("_LTLOD")) %>%
   select(-contains("_As"))
 
+urine_element %>% head()
+
 # Urinary Arsenic
 urine_arsenic <- urine_arsenic %>%
   select(UID, As = PE_uAs_Sum_SG)
+
+urine_arsenic %>% head()
 
 ##### Join Data ################################################################
 df_urine <- left_join(pregtrak, urine_element, by = "UID")
@@ -53,6 +57,7 @@ df_urine %>% sapply(function(x) sum(is.na(x)))
 # (DROP: Observations with All Values Missing [n=4])
 df_urine <- df_urine %>%
   filter(!is.na(As))
+df_urine %>% nrow()
 
 # Values <LLOD
 # (Note: This does not include urinary arsenic.)
@@ -65,6 +70,8 @@ df_urine_llod_indicators <- df_urine %>%
     names_to = "Element", 
     values_to = "Indicator"
   )
+
+df_urine_llod_indicators %>% head()
 
 df_urine_llod_indicators %>%
   group_by(Element) %>%
@@ -99,6 +106,23 @@ df_urine_long <- df_urine %>%
     names_to = "Element",
     values_to = "Urine"
   )
+
+df_urine_long %>% head()
+
+# Values: Linear Scale (Wide) (<LLOD Set to Missing)
+df_urine_missing <- left_join(df_urine_long, df_urine_llod_indicators, 
+  by = c("UID","Element"))
+
+df_urine_missing <- df_urine_missing %>%
+  mutate(Indicator = ifelse(Element == "As", 0, Indicator))
+
+df_urine_missing <- df_urine_missing %>%
+  mutate(Urine = ifelse(Indicator == 1, NA, Urine)) %>%
+  pivot_wider(id_cols = UID, names_from = Element, values_from = Urine)
+
+df_urine_missing %>% head()
+
+df_urine_missing %>% sapply(function(x) sum(is.na(x)))
 
 ##### Remove Source Data #######################################################
 rm(list = c("pregtrak","urine_arsenic","urine_element"))

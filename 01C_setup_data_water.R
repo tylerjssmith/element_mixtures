@@ -48,6 +48,7 @@ df_water %>% sapply(function(x) sum(is.na(x)))
 # (DROP: Observations with All Values Missing [n=4])
 df_water <- df_water %>%
   filter(!is.na(PE_wMetals_As))
+df_water %>% nrow()
 
 # (DROP: Elements with Mass Drift [K, Mg, Na])
 df_water <- df_water %>%
@@ -67,6 +68,8 @@ df_water_llod_indicators <- df_water %>%
     names_to = "Element", 
     values_to = "Indicator"
   )
+
+df_water_llod_indicators %>% head()
 
 df_water_llod_indicators %>%
   group_by(Element) %>%
@@ -95,6 +98,8 @@ df_water <- df_water %>%
   select(sort(colnames(df_water))) %>%
   select(UID, everything())
 
+df_water
+
 # Values: Linear Scale (Long)
 df_water_long <- df_water %>%
   pivot_longer(
@@ -103,6 +108,8 @@ df_water_long <- df_water %>%
     values_to = "Water"
   )
 
+df_water_long %>% head()
+
 # Values: Linear Scale (Wide) (<LLOD Set to Missing)
 df_water_missing <- left_join(df_water_long, df_water_llod_indicators, 
   by = c("UID","Element"))
@@ -110,6 +117,10 @@ df_water_missing <- left_join(df_water_long, df_water_llod_indicators,
 df_water_missing <- df_water_missing %>%
   mutate(Water = ifelse(Indicator == 1, NA, Water)) %>%
   pivot_wider(id_cols = UID, names_from = Element, values_from = Water)
+
+df_water_missing %>% head()
+
+df_water_missing %>% sapply(function(x) sum(is.na(x)))
 
 ##### Remove Source Data #######################################################
 rm(list = c("pregtrak","water"))

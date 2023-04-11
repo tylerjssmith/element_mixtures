@@ -23,11 +23,3 @@ tmp %>%
   )
 
 rm(tmp)
-
-##### Check Outliers ###########################################################
-df_water_long %>%
-  group_by(Element) %>%
-  mutate(Water = scale(log(Water))) %>%
-  filter(abs(Water) > 4)
-
-

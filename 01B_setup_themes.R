@@ -14,6 +14,22 @@ th <- theme_bw() +
   theme(
     panel.grid.major.x = element_blank(),
     panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 16, face = "bold"),
+    strip.text = element_text(size = 14),
     axis.title = element_text(size = 14),
-    axis.text = element_text(size = 14)
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 14)
+  )
+
+th1 <- theme_classic() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 16, face = "bold"),
+    strip.text = element_text(size = 14),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 14)
   )

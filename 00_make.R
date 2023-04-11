@@ -29,14 +29,20 @@ setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 # 02A Exploratory Data Analysis
 source("02A_explore.R")
 
-# 02B Multiple Imputation
-source("02B_mice.R")
+# 02B Multiple Imputation - Water
+source("02B_impute_water.R")
 
-# 02C Principal Component Analyses
-source("02C_pca.R")
+# 02C Multiple Imputation - Urine
+source("02C_impute_urine.R")
 
-# 02D Quantile Regression
-source("02D_quantreg.R")
+# 02D Outliers
+source("02D_outliers.R")
+
+# 02E Principal Component Analyses
+source("02E_pca.R")
+
+# 02F Quantile Regression
+source("02F_quantreg.R")
 
 ##### 03 Tables and Figures ####################################################
 # 03A Table 1 (Drinking Water Elements)
