@@ -32,21 +32,21 @@ check_discrete <- function(data, x)
 }
 
 ##### Functions: Check Imputations #############################################
-check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water, 
-  df_llod = water_llod, title = NULL)
+check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt2, 
+  df_llod = df_water_llod_val, title = NULL)
 {
   # Data: Multiple Imputation
   df_mi <- df_mi %>% 
     tibble() %>% 
     mutate(type = "Multiple Imputation") %>%
-    select(type, .imp, As, {{ element }})
+    select(type, .imp, {{ element }})
 
   # Data: LLOD/√2
   df_s2 <- df_s2 %>% 
     tibble() %>%
     mutate(type = "LLOD/√2") %>% 
     mutate(.imp = "LLOD/√2") %>% 
-    select(type, .imp, As, {{ element }})
+    select(type, .imp, {{ element }})
 
   # Stack Data
   df <- rbind(df_mi, df_s2)
@@ -54,14 +54,14 @@ check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water,
   # Get LLOD
   element_name <- deparse(substitute(element))
   
-  llod <- water_llod %>%
+  llod <- df_llod %>%
     filter(ELEMENT == element_name) %>%
     pull(LLOD)
   
   # Generate Plot
   df %>%
     mutate(.imp = factor(.imp, levels = c("LLOD/√2", 1:m), 
-      labels = c("LLOD/√2",paste("Imputation",1:m)))) %>%
+      labels = c("LLOD/√2",paste("Impute",1:m)))) %>%
     ggplot(aes(x = log({{ element }}))) +
     geom_vline(xintercept = log(llod), linetype = "dashed") +
     geom_histogram(fill = "white", color = "black") +
@@ -74,9 +74,11 @@ check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water,
     th + theme(legend.position = "none")
 }
 
-check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water, 
-  df_llod = water_llod, title = NULL)
+check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt2, 
+  df_llod = df_water_llod_val, title = NULL)
 {
+  require(viridis)
+  
   # Data: Multiple Imputation
   df_mi <- df_mi %>% 
     tibble() %>% 
@@ -96,12 +98,13 @@ check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water,
   # Get LLOD
   element_name <- deparse(substitute(element))
   
-  llod <- water_llod %>%
+  llod <- df_llod %>%
     filter(ELEMENT == element_name) %>%
     pull(LLOD)
   
   # Set Colors for Plot
-  scale_m5 <- c("black","#F8766D","#A3A500","#00BF7D","#00B0F6","#E76BF3")
+  color_scale <- magma(26)
+  color_scale[1] <- "black"
   
   # Generate Plot
   df %>%
@@ -109,7 +112,7 @@ check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water,
     ggplot(aes(x = log({{ element }}), color = factor(.imp))) +
     geom_vline(xintercept = log(llod), linetype = "dashed") +
     geom_density() +
-    scale_color_manual(values = scale_m5) +
+    scale_color_manual(values = color_scale) +
     facet_grid(type ~ .) +
     labs(
       title = title,

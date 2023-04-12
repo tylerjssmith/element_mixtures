@@ -13,42 +13,54 @@ library(qgcomp)
 
 ##### Check Data ###############################################################
 # Drinking Water
-df_water_missing %>% head()
-df_water_missing %>% sapply(function(x) sum(is.na(x)))
+df_water_miss %>% head()
+df_water_miss %>% sapply(function(x) sum(is.na(x)))
 
-##### Multiple Imputation: Drinking Water ######################################
+##### Set and Check Parameters #################################################
 # Set Random Seed
 set.seed(7023)
 
 # Imputations (m)
-m <- 5
-
-# Iterations (maxit)
-i <- 1
+m <- 25
 
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID is not used for imputation.)
-mice_predictors_water <- matrix(1, 17, 17)
+tmp <- df_water_miss %>% ncol()
+mice_predictors_water <- matrix(1, tmp, tmp)
 mice_predictors_water[,1] <- mice_predictors_water[1,] <- 0
 mice_predictors_water
+rm(tmp)
 
 # Limits of Detection (lod -- passed to mice.impute.leftcenslognorm())
-water_names <- tibble(ELEMENT = colnames(df_water_missing))
-water_llod_mice <- left_join(water_names, water_llod, by = "ELEMENT")
+water_names <- tibble(ELEMENT = colnames(df_water_miss))
+water_llod_mice <- left_join(water_names, df_water_llod_val, by = "ELEMENT")
 water_llod_mice
 
 # (Test Number of Limits of Detection)
-if(length(water_llod_mice %>% pull(ELEMENT)) != length(colnames(df_water_missing))) stop("check lod -- number")
+length_water_mice <- length(water_llod_mice %>% pull(ELEMENT))
+length_water_miss <- length(colnames(df_water_miss))
+
+if(length_water_mice != length_water_miss) stop("check lod -- number")
+
+rm(length_water_mice)
+rm(length_water_miss)
 
 # (Test Order of Limits of Detection)
-if(sum(water_llod_mice %>% pull(ELEMENT) != colnames(df_water_missing)) == length(water_llod_mice %>% pull(ELEMENT))) stop("check lod -- order")
+order_water_mice <- sum(water_llod_mice %>% pull(ELEMENT) != colnames(df_water_miss))
+order_water_miss <- length(water_llod_mice %>% pull(ELEMENT))
+
+if(order_water_mice == order_water_miss) stop("check lod -- order")
+
+rm(order_water_mice)
+rm(order_water_miss)
 
 # (Extract LLOD)
 water_llod_mice <- water_llod_mice %>% pull(LLOD)
 water_llod_mice
 
 ##### Conduct Multiple Imputation ##############################################
-impt_water <- mice(df_water_missing, m = m, maxit = i, method = "leftcenslognorm", 
+# Impute Data
+impt_water <- mice(df_water_miss, m = m, method = "leftcenslognorm", 
   predictorMatrix = mice_predictors_water, lod = water_llod_mice)
 
 # Check Logged Events
@@ -58,7 +70,7 @@ impt_water$loggedEvents
 df_water_impt <- complete(impt_water, action = "long")
 
 ##### Check Imputations ########################################################
-df_water_missing %>% sapply(function(x) round(sum(is.na(x)) / 780 * 100, 1))
+df_water_miss %>% sapply(function(x) round(sum(is.na(x)) / 780 * 100, 1))
 
 # Aluminum
 check_impt_dens(Al, title = "Aluminum")

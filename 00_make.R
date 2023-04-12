@@ -17,11 +17,20 @@ source("01B_setup_themes.R")
 # 01C Data - Water
 source("01C_setup_data_water.R")
 
-# 01D Data - Urine
-source("01D_setup_data_urine.R")
+# 01D Data - Water - Impute
+source("01D_setup_impute_water.R")
 
-# 01E Data - Covariates
-source("01E_setup_data_covar.R")
+# 01E Data - Urine
+source("01E_setup_data_urine.R")
+
+# 01F Data - Urine - Impute
+source("01F_setup_impute_urine.R")
+
+# 01G Data - Outliers
+source("01G_setup_outliers.R")
+
+# 01H Data - Covariates
+source("01H_setup_data_covar.R")
 
 ##### 02 Analysis ##############################################################
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
@@ -29,20 +38,11 @@ setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 # 02A Exploratory Data Analysis
 source("02A_explore.R")
 
-# 02B Multiple Imputation - Water
-source("02B_impute_water.R")
-
-# 02C Multiple Imputation - Urine
-source("02C_impute_urine.R")
-
-# 02D Outliers
-source("02D_outliers.R")
-
 # 02E Principal Component Analyses
-source("02E_pca.R")
+source("02B_pca.R")
 
 # 02F Quantile Regression
-source("02F_quantreg.R")
+source("02C_quantreg.R")
 
 ##### 03 Tables and Figures ####################################################
 # 03A Table 1 (Drinking Water Elements)

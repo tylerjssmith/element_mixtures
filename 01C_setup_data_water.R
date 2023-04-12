@@ -13,9 +13,9 @@ library(tidyverse)
 setwd("~/Johns Hopkins/PAIR Data - Documents/Data/Current/")
 
 ##### Read Data ################################################################
-pregtrak   <- read_csv("j7pregtrak/pair_pregtrak_2022_0309.csv")
-water      <- read_csv("assay_water_metals/pair_watermetals_pef_2022_1030.csv")
-water_llod <- read_csv("assay_water_metals/pair_watermetals_llod_2022_1030.csv")
+pregtrak          <- read_csv("j7pregtrak/pair_pregtrak_2022_0309.csv")
+water             <- read_csv("assay_water_metals/pair_watermetals_pef_2022_1030.csv")
+df_water_llod_val <- read_csv("assay_water_metals/pair_watermetals_llod_2022_1030.csv")
 
 # Reset Working Directory
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
@@ -42,13 +42,13 @@ df_water <- left_join(pregtrak, water, by = "UID")
 
 ##### Address Missingness ######################################################
 # True Missingness
-df_water %>% nrow()
+df_water %>% dim()
 df_water %>% sapply(function(x) sum(is.na(x)))
 
 # (DROP: Observations with All Values Missing [n=4])
 df_water <- df_water %>%
   filter(!is.na(PE_wMetals_As))
-df_water %>% nrow()
+df_water %>% dim()
 
 # (DROP: Elements with Mass Drift [K, Mg, Na])
 df_water <- df_water %>%
@@ -57,9 +57,10 @@ df_water <- df_water %>%
     -contains("_Mg"), 
     -contains("_Na")
   )
+df_water %>% dim()
 
 # Values <LLOD
-df_water_llod_indicators <- df_water %>%
+df_water_llod_ind <- df_water %>%
   select(UID, ends_with("_LTLOD")) %>%
   rename_with(~ gsub("PE_wMetals_", "", .x)) %>%
   rename_with(~ gsub("_LTLOD", "", .x)) %>%
@@ -69,9 +70,9 @@ df_water_llod_indicators <- df_water %>%
     values_to = "Indicator"
   )
 
-df_water_llod_indicators %>% head()
+df_water_llod_ind %>% head()
 
-df_water_llod_indicators %>%
+df_water_llod_ind %>%
   group_by(Element) %>%
   summarise(
     n = sum(Indicator),
@@ -86,44 +87,45 @@ df_water <- df_water %>%
     -contains("_Pb"),
     -contains("_Zn")
   )
+df_water %>% dim()
 
 ##### Prepare Data Objects #####################################################
-# Values: Linear Scale (Wide)
-df_water <- df_water %>%
+# Values: LLOD/√2 (Wide)
+df_water_sqt2 <- df_water %>%
   select(-ends_with("_LTLOD")) %>%
   rename_with(~ gsub("PE_wMetals_", "", .x)) %>%
   rename_with(~ gsub("_LTLOD", "", .x))
 
-df_water <- df_water %>%
-  select(sort(colnames(df_water))) %>%
+df_water_sqt2 <- df_water_sqt2 %>%
+  select(sort(colnames(df_water_sqt2))) %>%
   select(UID, everything())
 
-df_water
+df_water_sqt2
 
-# Values: Linear Scale (Long)
-df_water_long <- df_water %>%
+# Values: LLOD/√2 (Long)
+df_water_sqt2_long <- df_water_sqt2 %>%
   pivot_longer(
     cols = -UID, 
     names_to = "Element", 
     values_to = "Water"
   )
 
-df_water_long %>% head()
+df_water_sqt2_long %>% head()
 
 # Values: Linear Scale (Wide) (<LLOD Set to Missing)
-df_water_missing <- left_join(df_water_long, df_water_llod_indicators, 
+df_water_miss <- left_join(df_water_sqt2_long, df_water_llod_ind, 
   by = c("UID","Element"))
 
-df_water_missing <- df_water_missing %>%
+df_water_miss <- df_water_miss %>%
   mutate(Water = ifelse(Indicator == 1, NA, Water)) %>%
   pivot_wider(id_cols = UID, names_from = Element, values_from = Water)
 
-df_water_missing %>% head()
+df_water_miss %>% head()
 
-df_water_missing %>% sapply(function(x) sum(is.na(x)))
+df_water_miss %>% sapply(function(x) sum(is.na(x)))
 
 ##### Remove Source Data #######################################################
-rm(list = c("pregtrak","water"))
+rm(list = c("pregtrak","water","df_water"))
 
 
 
