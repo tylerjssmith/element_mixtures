@@ -10,7 +10,7 @@
 library(tidyverse)
 
 ##### Summarize Urinary Arsenobetaine ##########################################
-tmp <- left_join(df_water, df_covar, by = "UID")
+tmp <- left_join(df_water_sqt2, df_covar, by = "UID")
 
 tmp %>% 
   select(uAsB) %>% 
