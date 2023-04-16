@@ -19,7 +19,8 @@ pefsst   <- read_csv("pefsst/pair_pefsst_2022_0310.csv")
 parity   <- read_csv("pair_reprohistory/pair_reprohistory_2022_0328.csv")
 ses      <- read_csv("ses/pair_ses_2022_0310.csv")
 pef      <- read_csv("pef/pair_pef_2022_0310.csv")
-uasb     <- read_csv("assay_urinary_metals/pair_urinaryarsenic_2022_1029.csv")
+urine    <- read_csv("assay_urinary_metals/pair_urinaryarsenic_2022_1029.csv")
+water    <- read_csv("assay_water_metals/pair_watermetals_pef_2022_1030.csv")
 
 # Reset Working Directory
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
@@ -39,7 +40,9 @@ pefsst <- pefsst %>%
   select(
     UID, 
     SEDATE, 
-    SEWKINT
+    SEWKINT,
+    SEBMI,
+    medSEMUAC
   )
 
 # Parity
@@ -69,23 +72,34 @@ pef <- pef %>%
   )
 
 # Urinary Arsenobetaine
-uasb <- uasb %>%
+urine <- urine %>%
   select(
     UID,
     uAsB = PE_uAs_Ab_SG
   )
+
+# Drinking Water Arsenic
+water <- water %>%
+  select(
+    UID,
+    wAs = PE_wMetals_As
+  )
+
+water <- water %>%
+  mutate(UID = as.numeric(UID))
 
 ##### Join Data ################################################################
 df_covar <- left_join(pregtrak, pefsst, by = "UID")
 df_covar <- left_join(df_covar, parity, by = "UID")
 df_covar <- left_join(df_covar, ses, by = "UID")
 df_covar <- left_join(df_covar, pef, by = "UID")
-df_covar <- left_join(df_covar, uasb, by = "UID")
+df_covar <- left_join(df_covar, urine, by = "UID")
+df_covar <- left_join(df_covar, water, by = "UID")
 
 df_covar %>% head()
 
 # Remove Source Data
-rm(list = c("pregtrak","pefsst","parity","ses","pef","uasb"))
+rm(list = c("pregtrak","pefsst","parity","ses","pef","urine","water"))
 
 ##### Prepare Data #############################################################
 # Age
@@ -110,12 +124,20 @@ df_covar %>%
 df_covar <- df_covar %>%
   mutate(PARITY = ifelse(PARITY > 2, 2, PARITY))
 
+df_covar <- df_covar %>%
+  mutate(PARITY = factor(PARITY, levels = c(0:2), 
+    labels = c("Nulliparous","Primiparous","Multiparous")))
+
 df_covar %>%
   check_discrete(PARITY)
 
 # Education
 df_covar <- df_covar %>%
   mutate(EDUCATION = ifelse(EDUCATION > 2, 2, EDUCATION))
+
+df_covar <- df_covar %>%
+  mutate(EDUCATION = factor(EDUCATION, levels = c(0:2), 
+    labels = c("None","Class 1-9","Class ≥10")))
 
 df_covar %>%
   check_discrete(EDUCATION)
@@ -128,9 +150,29 @@ df_covar %>%
     title = "Living Standards Index"
   )
 
+# Body Mass Index (BMI)
+df_covar %>%
+  check_continuous(
+    x = SEBMI,
+    xlab = expression("Body Mass Index (kg/m" ^ 2 * ")"),
+    title = "Body Mass Index"
+  )
+
+# Mid-upper Arm Circumference (MUAC)
+df_covar %>%
+  check_continuous(
+    x = medSEMUAC,
+    xlab = expression("Mid-upper Arm Circumference (MUAC)"),
+    title = "Mid-upper Arm Circumference"
+  )
+
 # Pesticide Use
 df_covar <- df_covar %>%
   mutate(PESTICIDE = ifelse(PEMIXPEST == 1 | PESPRAYPEST == 1, 1, 0))
+
+df_covar <- df_covar %>%
+  mutate(PESTICIDE = factor(PESTICIDE, levels = c(0:1), 
+    labels = c("No","Yes")))
 
 df_covar %>%
   check_discrete(PEMIXPEST)
@@ -143,21 +185,59 @@ df_covar %>%
 df_covar <- df_covar %>%
   mutate(PETOBAC = as.numeric(PETOBAC))
 
+df_covar <- df_covar %>%
+  mutate(PETOBAC = factor(PETOBAC, levels = c(0:1), 
+    labels = c("No","Yes")))
+
 df_covar %>%
   check_discrete(PETOBAC)
 
 # Betel Nut
+df_covar <- df_covar %>%
+  mutate(PEBETEL = factor(PEBETEL, levels = c(0:1), 
+    labels = c("No","Yes")))
+
 df_covar %>%
   check_discrete(PEBETEL)
 
 # Husband's Smoking
+df_covar <- df_covar %>%
+  mutate(PEHCIGAR = factor(PEHCIGAR, levels = c(0:1), 
+    labels = c("No","Yes")))
+
 df_covar %>%
   check_discrete(PEHCIGAR)
 
+# Urinary Arsenobetaine
+df_covar %>%
+  check_continuous(
+    log(uAsB), 
+    xlab = "Log(Urinary Arsenobetaine)", 
+    title = "Urinary Arsenobetaine"
+  )
+
+# Drinking Water Arsenic
+df_covar %>%
+  check_continuous(
+    log(wAs), 
+    xlab = "Log(Drinking Water Arsenic)", 
+    title = "Drinking Water Arsenic"
+  )
+
+df_covar <- df_covar %>%
+  mutate(wAs10 = ifelse(wAs > 10, 1, 0))
+
+df_covar <- df_covar %>%
+  mutate(wAs10 = factor(wAs10, levels = c(0:1), 
+    labels = c("≤10",">10")))
+
+df_covar %>%
+  check_discrete(wAs10)
+
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, PESTICIDE, PETOBAC, 
-    PEBETEL, PEHCIGAR, uAsB)
+  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, SEBMI, medSEMUAC,
+    PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, uAsB, wAs10)
 
 df_covar %>%
   sapply(function(x) sum(is.na(x)))

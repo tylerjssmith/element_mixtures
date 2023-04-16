@@ -89,6 +89,13 @@ df_water <- df_water %>%
   )
 df_water %>% dim()
 
+##### Address Measurement Error ################################################
+# Drop Aluminum > 50,000 µg/L
+# (Note: This value suggests a sand particle was included in the specimen and
+#  dissolved via acidification during sample preparation.)
+df_water <- df_water %>%
+  filter(PE_wMetals_Al <= 50000)
+
 ##### Prepare Data Objects #####################################################
 # Values: LLOD/√2 (Wide)
 df_water_sqt2 <- df_water %>%
@@ -102,25 +109,38 @@ df_water_sqt2 <- df_water_sqt2 %>%
 
 df_water_sqt2
 
-# Values: LLOD/√2 (Long)
-df_water_sqt2_long <- df_water_sqt2 %>%
+# Values: Missing (Wide)
+# (Note: This sets values <LLOD to missing for subsequent imputation.)
+df_water_miss <- df_water_sqt2 %>%
   pivot_longer(
     cols = -UID, 
     names_to = "Element", 
     values_to = "Water"
   )
 
-df_water_sqt2_long %>% head()
+df_water_miss %>% head()
 
-# Values: Linear Scale (Wide) (<LLOD Set to Missing)
-df_water_miss <- left_join(df_water_sqt2_long, df_water_llod_ind, 
+df_water_miss <- left_join(df_water_miss, df_water_llod_ind, 
   by = c("UID","Element"))
+
+df_water_miss %>% head()
 
 df_water_miss <- df_water_miss %>%
   mutate(Water = ifelse(Indicator == 1, NA, Water)) %>%
-  pivot_wider(id_cols = UID, names_from = Element, values_from = Water)
+  pivot_wider(
+    id_cols = UID, 
+    names_from = Element, 
+    values_from = Water
+  )
 
 df_water_miss %>% head()
+
+##### Check Data ###############################################################
+df_water_sqt2 %>% head()
+df_water_miss %>% head()
+
+dim(df_water_sqt2) == dim(df_water_miss)
+colnames(df_water_sqt2) == colnames(df_water_miss)
 
 df_water_miss %>% sapply(function(x) sum(is.na(x)))
 

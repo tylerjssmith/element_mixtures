@@ -17,20 +17,20 @@ source("01B_setup_themes.R")
 # 01C Data - Water
 source("01C_setup_data_water.R")
 
-# 01D Data - Water - Impute
-source("01D_setup_impute_water.R")
+# 01D Data - Urine
+source("01D_setup_data_urine.R")
 
-# 01E Data - Urine
-source("01E_setup_data_urine.R")
+# 01E Data - Covariates
+source("01E_setup_data_covar.R")
+
+# 01F Data - Reconcile
+source("01F_setup_data_reconcile.R")
+
+# 01G Data - Water - Impute
+source("01G_setup_impute_water.R")
 
 # 01F Data - Urine - Impute
-source("01F_setup_impute_urine.R")
-
-# 01G Data - Outliers
-source("01G_setup_outliers.R")
-
-# 01H Data - Covariates
-source("01H_setup_data_covar.R")
+source("01H_setup_impute_urine.R")
 
 ##### 02 Analysis ##############################################################
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")

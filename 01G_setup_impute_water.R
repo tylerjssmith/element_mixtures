@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Multiple Imputation
+# Identifying Element Mixtures -- Multiple Imputation -- Water
 
 # Tyler Smith
 # April 7, 2023
@@ -26,8 +26,9 @@ m <- 25
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID is not used for imputation.)
 tmp <- df_water_miss %>% ncol()
-mice_predictors_water <- matrix(1, tmp, tmp)
+mice_predictors_water <- matrix(1, nrow = tmp, ncol = tmp)
 mice_predictors_water[,1] <- mice_predictors_water[1,] <- 0
+diag(mice_predictors_water) <- 0
 mice_predictors_water
 rm(tmp)
 
@@ -68,34 +69,6 @@ impt_water$loggedEvents
 
 # Extract Imputed Data Sets
 df_water_impt <- complete(impt_water, action = "long")
-
-##### Check Imputations ########################################################
-df_water_miss %>% sapply(function(x) round(sum(is.na(x)) / 780 * 100, 1))
-
-# Aluminum
-check_impt_dens(Al, title = "Aluminum")
-check_impt_hist(Al, title = "Aluminum")
-
-# Bromine
-check_impt_dens(Br, title = "Bromine")
-check_impt_hist(Br, title = "Bromine")
-
-# Sulphur
-check_impt_dens(S, title = "Sulphur")
-check_impt_hist(S, title = "Sulphur")
-
-# Antimony
-check_impt_dens(Sb, title = "Antimony")
-check_impt_hist(Sb, title = "Antimony")
-
-# Uranium
-check_impt_dens(U, title = "Uranium")
-check_impt_hist(U, title = "Uranium")
-
-# Tungsten
-check_impt_dens(W, title = "Tungsten")
-check_impt_hist(W, title = "Tungsten")
-
 
 
 

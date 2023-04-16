@@ -30,7 +30,8 @@ pregtrak <- pregtrak %>%
 pregtrak %>% head()
 
 # Urinary Elements
-# (Note: Starting with Values Uncorrected for Specific Gravity)
+# (Note: This script uses values prior to correction for specific gravity. The
+#  correction will be applied following multiple imputation.)
 urine_element <- urine_element %>%
   select(UID, SPECIFICGRAVITY, starts_with("PE_uMetals_")) %>%
   select(c(UID, SPECIFICGRAVITY, !ends_with("_SG"))) %>%
@@ -39,6 +40,9 @@ urine_element <- urine_element %>%
 urine_element %>% head()
 
 # Urinary Arsenic
+# (Note: Since all urinary arsenic species were above the LLOD, they will not be
+#  affected by multiple imputation and the sum of specific gravity-corrected
+#  inorganic, monomethyl, and dimethyl arsenic is included here.)
 urine_arsenic <- urine_arsenic %>%
   select(UID, As = PE_uAs_Sum_SG)
 
@@ -88,44 +92,52 @@ df_urine <- df_urine %>%
 df_urine %>% dim()
 
 ##### Prepare Data Objects #####################################################
-# Values: Linear Scale (Wide)
-df_urine_sqt2 <- df_urine %>%
+# Values: LLOD/√2 (Wide)
+df_urine_sqt2_nosg <- df_urine %>%
   select(-ends_with("_LTLOD")) %>%
   rename_with(~ gsub("PE_uMetals_", "", .x))
 
-df_urine_sqt2 <- df_urine_sqt2 %>%
-  select(sort(colnames(df_urine_sqt2))) %>%
+df_urine_sqt2_nosg <- df_urine_sqt2_nosg %>%
+  select(sort(colnames(df_urine_sqt2_nosg))) %>%
   select(UID, SPECIFICGRAVITY, everything())
 
-df_urine_sqt2 %>% head()
+df_urine_sqt2_nosg %>% head()
 
-# Values: Linear Scale (Long)
-df_urine_sqt2_long <- df_urine_sqt2 %>%
+# Values: Missing (Wide)
+# (Note: This sets values <LLOD to missing for subsequent imputation.)
+df_urine_miss_nosg <- df_urine_sqt2_nosg %>%
   pivot_longer(
     cols = -c(UID,SPECIFICGRAVITY),
     names_to = "Element",
     values_to = "Urine"
   )
 
-df_urine_sqt2_long %>% head()
+df_urine_miss_nosg %>% head()
 
-# Values: Linear Scale (Wide) (<LLOD Set to Missing)
-df_urine_miss <- left_join(df_urine_sqt2_long, df_urine_llod_ind, 
+df_urine_miss_nosg <- left_join(df_urine_miss_nosg, df_urine_llod_ind, 
   by = c("UID","Element"))
 
-df_urine_miss
+df_urine_miss_nosg %>% head()
 
-df_urine_miss <- df_urine_miss %>%
+df_urine_miss_nosg <- df_urine_miss_nosg %>%
   mutate(Indicator = ifelse(Element == "As", 0, Indicator))
 
-df_urine_miss <- df_urine_miss %>%
+df_urine_miss_nosg <- df_urine_miss_nosg %>%
   mutate(Urine = ifelse(Indicator == 1, NA, Urine)) %>%
-  pivot_wider(id_cols = c(UID,SPECIFICGRAVITY), names_from = Element, 
-    values_from = Urine)
+  pivot_wider(
+    id_cols = c(UID,SPECIFICGRAVITY), 
+    names_from = Element, 
+    values_from = Urine
+  )
 
-df_urine_miss %>% head()
+##### Check Data ###############################################################
+df_urine_sqt2_nosg %>% head()
+df_urine_miss_nosg %>% head()
 
-df_urine_miss %>% sapply(function(x) sum(is.na(x)))
+df_urine_sqt2_nosg %>% dim()
+df_urine_miss_nosg %>% dim()
+
+df_urine_miss_nosg %>% sapply(function(x) sum(is.na(x)))
 
 ##### Remove Source Data #######################################################
 rm(list = c("pregtrak","urine_arsenic","urine_element","df_urine"))
