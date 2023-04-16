@@ -9,21 +9,34 @@
 # Load Packages
 library(tidyverse)
 
-##### Generate Density Plots ###################################################
-# Extract Imputation
-tmp <- complete(impt, action = 1) %>% tibble()
+##### Generate Figure ##########################################################
+df_figS2 <- df_urine_llod_ind %>%
+  filter(Element %in% colnames(df_water_miss)) %>%
+  group_by(Element) %>%
+  count(Indicator) %>%
+  mutate(p = n / sum(n) * 100) %>%
+  arrange(Element, desc(Indicator)) %>%
+  slice_head() %>%
+  mutate(p = ifelse(Indicator == 0, 0, p)) %>%
+  ungroup()
 
-# Add Arsenic Indicator; Log Transform Elements
-tmp <- tmp %>%
-  mutate(As1 = ifelse(As > 10, 1, 0)) %>%
-  mutate(across(-c(UID,As1), ~ log(.x)))
+df_figS2 %>%
+  mutate(category = 
+      ifelse(p == 0,           "0", 
+      ifelse(p > 0  & p <= 10, ">0-10", 
+      ifelse(p > 10 & p <= 30, ">10-30", 
+      ifelse(p > 30 & p <= 50, ">30-50", 
+      ifelse(p > 50,           ">50", NA)))))
+  ) %>%
+  arrange(p, Element)
 
-tmp %>% head()
-
-# Generate Plots
-tmp %>%
-  pivot_longer(-c(UID,As1)) %>%
-  ggplot(aes(x = factor(As1), y = value, group = As1)) +
-  geom_boxplot() +
-  facet_wrap(. ~ name, scales = "free") +
-  th
+(figS2 <- df_figS2 %>%
+  ggplot(aes(x = Element, y = p)) +
+  geom_hline(yintercept = 50, color = "red") +
+  geom_bar(stat = "identity", fill = "lightgray") +
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100,10)) +
+  labs(
+    title = "Urinary Elements <LLOD",
+    x = "Element",
+    y = "<LLOD (%)") +
+  th)
