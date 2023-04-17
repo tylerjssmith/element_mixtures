@@ -6,8 +6,20 @@ This repository contains R code for an analysis of element mixtures among pregna
 * [Make File](00_make.R)
 
 ## 01 Setup
+* [Setup: Functions](01A_setup_functions.R)
+* [Setup: Themes](01B_setup_themes.R)
+* [Setup: Data - Water](01C_setup_data_water.R)
+* [Setup: Data - Urine](01D_setup_data_urine.R)
+* [Setup: Data - Covariates](01E_setup_data_covar.R)
+* [Setup: Data - Reconcile](01F_setup_data_reconcile.R)
+* [Setup: Impute - Water](01G_setup_impute_water.R)
+* [Setup: Impute - Urine](01H_setup_impute_urine.R)
 
 ## 02 Analysis
+* [Analysis: Explore](02A_explore.R)
+* [Analysis: Principal Components Analysis](02B_pca.R)
+* [Analysis: Quantile Regression](02C_quantreg.R)
+* [Analysis: Spearman's Correlations](02D_spearman.R)
 
 ## 03 Tables and Figures
 
