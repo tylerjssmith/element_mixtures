@@ -15,7 +15,6 @@ library(psych)
 df_water_impt %>% head()
 
 df_water_impt_ln_z <- df_water_impt %>%
-  tibble() %>%
   group_by(.imp) %>%
   mutate(across(Al:W, ~ log(.x))) %>%
   mutate(across(Al:W, ~ scale(.x))) %>%
@@ -27,7 +26,9 @@ df_water_impt_ln_z %>% head()
 corr_mat_water <- list()
 
 for(i in 1:m) {
-  data <- df_water_impt_ln_z %>% select(Al:W)
+  data <- df_water_impt_ln_z %>% 
+    filter(.imp == i) %>% 
+    select(Al:W)
   corr_mat_water[[i]] <- cor(data, method = "pearson")
 }
 
@@ -59,7 +60,9 @@ df_urine_impt_ln_z %>% head()
 corr_mat_urine <- list()
 
 for(i in 1:m) {
-  data <- df_urine_impt_ln_z %>% select(Al:Zn)
+  data <- df_urine_impt_ln_z %>% 
+    filter(.imp == 1) %>% 
+    select(Al:Zn)
   corr_mat_urine[[i]] <- cor(data, method = "pearson")
 }
 

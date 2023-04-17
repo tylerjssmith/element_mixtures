@@ -28,6 +28,7 @@ pregtrak <- pregtrak %>%
   select(UID)
 
 pregtrak %>% head()
+pregtrak %>% dim()
 
 # Urinary Elements
 # (Note: This script uses values prior to correction for specific gravity. The
@@ -38,6 +39,7 @@ urine_element <- urine_element %>%
   select(-contains("_As"))
 
 urine_element %>% head()
+urine_element %>% dim()
 
 # Urinary Arsenic
 # (Note: Since all urinary arsenic species were above the LLOD, they will not be
@@ -47,6 +49,7 @@ urine_arsenic <- urine_arsenic %>%
   select(UID, As = PE_uAs_Sum_SG)
 
 urine_arsenic %>% head()
+urine_arsenic %>% dim()
 
 ##### Join Data ################################################################
 # (Specific Gravity-corrected Values and <LLOD Indicators) 
@@ -54,16 +57,19 @@ df_urine <- left_join(pregtrak, urine_element, by = "UID")
 df_urine <- left_join(df_urine, urine_arsenic, by = "UID")
 
 df_urine %>% head()
+df_urine %>% dim()
 
 ##### Address Missingness ######################################################
 # True Missingness
 df_urine %>% dim()
-df_urine %>% sapply(function(x) sum(is.na(x)))
+
 
 # (DROP: Observations with All Values Missing [n=4])
 df_urine <- df_urine %>%
   filter(!is.na(As))
+
 df_urine %>% dim()
+df_urine %>% sapply(function(x) sum(is.na(x)))
 
 # Values <LLOD
 # (Note: This does not include urinary arsenic.)
@@ -89,7 +95,9 @@ df_urine_llod_ind %>%
 # (DROP: Elements with >50% of Values <LLOD [U])
 df_urine <- df_urine %>%
   select(!contains("PE_uMetals_U"))
+
 df_urine %>% dim()
+df_urine %>% sapply(function(x) sum(is.na(x)))
 
 ##### Prepare Data Objects #####################################################
 # Values: LLOD/√2 (Wide)
@@ -102,6 +110,7 @@ df_urine_sqt2_nosg <- df_urine_sqt2_nosg %>%
   select(UID, SPECIFICGRAVITY, everything())
 
 df_urine_sqt2_nosg %>% head()
+df_urine_sqt2_nosg %>% dim()
 
 # Values: Missing (Wide)
 # (Note: This sets values <LLOD to missing for subsequent imputation.)
@@ -130,12 +139,15 @@ df_urine_miss_nosg <- df_urine_miss_nosg %>%
     values_from = Urine
   )
 
+df_urine_miss_nosg %>% head()
+df_urine_miss_nosg %>% dim()
+
 ##### Check Data ###############################################################
 df_urine_sqt2_nosg %>% head()
 df_urine_miss_nosg %>% head()
 
-df_urine_sqt2_nosg %>% dim()
-df_urine_miss_nosg %>% dim()
+dim(df_urine_sqt2_nosg) == dim(df_urine_miss_nosg)
+colnames(df_urine_sqt2_nosg) == colnames(df_urine_miss_nosg)
 
 df_urine_miss_nosg %>% sapply(function(x) sum(is.na(x)))
 

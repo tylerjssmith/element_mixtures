@@ -23,15 +23,25 @@ label(df_covar$PESTICIDE) <- "Pesticide User"
 label(df_covar$PETOBAC)   <- "Chewing Tobacco User"
 label(df_covar$PEBETEL)   <- "Betel Nut User"
 label(df_covar$PEHCIGAR)  <- "Husband Smokes at Home"
+label(df_covar$wAs)       <- "Drinking Water Arsenic"
+label(df_covar$uAs)       <- "Urinary Arsenic"
 
 # Units
 units(df_covar$AGE)       <- "years"
 units(df_covar$SEGSTAGE)  <- "weeks"
 units(df_covar$SEBMI)     <- "kg/m^2"
 units(df_covar$medSEMUAC) <- "cm"
+units(df_covar$wAs)       <- "µg/L"
+units(df_covar$uAs)       <- "µg/L"
 
 # Table
 (tbl1 <- table1(~ AGE + SEGSTAGE + PARITY + EDUCATION + LSI + SEBMI + medSEMUAC + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR | wAs10, 
   data = df_covar, overall = FALSE, render.continuous = c("Mean (SD)" = "MEAN (SD)"), extra.col = list(`p` = pval_tbl1)))
-  
+
+(tbl1_arsenic <- table1(~ wAs + uAs | wAs10, 
+  data = df_covar, overall = FALSE, render.continuous = c("GM (GSD)" = "GMEAN (GSD)")))
+
+t.test(log(wAs) ~ wAs10, data = df_covar)
+t.test(log(uAs) ~ wAs10, data = df_covar)
+
   

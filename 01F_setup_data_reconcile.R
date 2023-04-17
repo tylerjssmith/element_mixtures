@@ -68,4 +68,3 @@ df_urine_llod_ind <- left_join(included_uid, df_urine_llod_ind, by = "UID")
 df_covar <- left_join(included_uid, df_covar, by = "UID")
 
 
-

@@ -72,19 +72,23 @@ impt_urine_nosg <- mice(df_urine_miss_nosg, m = m, method = "leftcenslognorm",
 impt_urine_nosg$loggedEvents
 
 # Extract Imputed Data Sets
-df_urine_impt_nosg <- complete(impt_urine_nosg, action = "long") %>% tibble()
+df_urine_impt_nosg <- complete(impt_urine_nosg, action = "long") %>% 
+  tibble()
+df_urine_impt_nosg %>% head()
 
 ##### Apply Specific Gravity Correction to Urinary Elements ####################
 # LLOD/√2: Wide
 df_urine_sqt2_nosg %>% head()
 
 df_urine_sqt2 <- df_urine_sqt2_nosg %>%
-  mutate(across(-c(UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / (SPECIFICGRAVITY - 1)))
+  mutate(across(-c(UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / 
+      (SPECIFICGRAVITY - 1)))
 
 # Multiple Imputation: Wide
 df_urine_impt_nosg %>% head()
 
 df_urine_impt <- df_urine_impt_nosg %>%
   group_by(.imp) %>%
-  mutate(across(-c(.id,UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / (SPECIFICGRAVITY - 1))) %>%
+  mutate(across(-c(.id,UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / 
+      (SPECIFICGRAVITY - 1))) %>%
   ungroup()

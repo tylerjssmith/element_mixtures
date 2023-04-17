@@ -12,9 +12,9 @@ library(mice)
 library(qgcomp)
 
 ##### Check Data ###############################################################
-# Drinking Water
 df_water_miss %>% head()
 df_water_miss %>% sapply(function(x) sum(is.na(x)))
+df_water_miss %>% dim()
 
 ##### Set and Check Parameters #################################################
 # Set Random Seed
@@ -56,8 +56,7 @@ rm(order_water_mice)
 rm(order_water_miss)
 
 # (Extract LLOD)
-water_llod_mice <- water_llod_mice %>% pull(LLOD)
-water_llod_mice
+(water_llod_mice <- water_llod_mice %>% pull(LLOD))
 
 ##### Conduct Multiple Imputation ##############################################
 # Impute Data
@@ -68,7 +67,9 @@ impt_water <- mice(df_water_miss, m = m, method = "leftcenslognorm",
 impt_water$loggedEvents
 
 # Extract Imputed Data Sets
-df_water_impt <- complete(impt_water, action = "long")
+df_water_impt <- complete(impt_water, action = "long") %>%
+  tibble()
+df_water_impt %>% head()
 
 
 

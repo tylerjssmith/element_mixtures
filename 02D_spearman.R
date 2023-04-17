@@ -33,6 +33,16 @@ df_urine_impt_long <- df_urine_impt %>%
 df_water_impt_long %>% head()
 df_urine_impt_long %>% head()
 
+df_water_impt_long %>%
+  group_by(.imp, Element) %>%
+  summarise(n = n()) %>%
+  filter(n != 778)
+
+df_urine_impt_long %>%
+  group_by(.imp, Element) %>%
+  summarise(n = n()) %>%
+  filter(n != 778)
+
 ##### Estimate Spearman's Correlations #########################################
 # Initialize Results Data Frame
 df_figS9 <- data.frame()
@@ -41,13 +51,9 @@ df_figS9 <- data.frame()
 # Loop Over 1 to jth Urinary Data Sets
 for(i in 1:m) {
   
-  i <- as.numeric(i)
-  
   out_j <- data.frame()
   
   for(j in 1:m) {
-    
-    j <- as.numeric(j)
     
     tmp_water <- df_water_impt_long[df_water_impt_long$.imp == i,]
     tmp_urine <- df_urine_impt_long[df_urine_impt_long$.imp == j,]
@@ -80,10 +86,10 @@ df_figS9 %>%
   group_by(Element) %>%
   summarise(
     n = n(),
-    mean = mean(rho),
+    median = median(rho),
     min = min(rho),
     max = max(rho),
-    range = max - min
+    range = signif(max - min, 1)
   ) %>%
   arrange(desc(range))
 

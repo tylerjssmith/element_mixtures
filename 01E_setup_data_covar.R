@@ -71,10 +71,11 @@ pef <- pef %>%
     PEHCIGAR
   )
 
-# Urinary Arsenobetaine
+# Urinary Arsenic
 urine <- urine %>%
   select(
     UID,
+    uAs = PE_uAs_Sum_SG,
     uAsB = PE_uAs_Ab_SG
   )
 
@@ -212,6 +213,13 @@ df_covar %>%
 df_covar %>%
   check_continuous(
     log(uAsB), 
+    xlab = "Log(∑uAs)", 
+    title = "Urinary Arsenic (∑uAs)"
+  )
+
+df_covar %>%
+  check_continuous(
+    log(uAsB), 
     xlab = "Log(Urinary Arsenobetaine)", 
     title = "Urinary Arsenobetaine"
   )
@@ -237,11 +245,11 @@ df_covar %>%
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
   select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, SEBMI, medSEMUAC,
-    PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, uAsB, wAs10)
+    PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, wAs, uAs, wAs10, uAsB)
 
 df_covar %>%
   sapply(function(x) sum(is.na(x)))
 
 df_covar %>% head()
-
+df_covar %>% dim()
 

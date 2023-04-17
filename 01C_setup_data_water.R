@@ -27,8 +27,9 @@ pregtrak <- pregtrak %>%
   select(UID)
 
 pregtrak %>% head()
+pregtrak %>% dim()
 
-# Drinking Water Elements
+# Drinking Water Elements (Values/<LLOD)
 water <- water %>%
   select(UID, starts_with("PE_wMetals_"))
 
@@ -36,6 +37,12 @@ water <- water %>%
   mutate(UID = as.numeric(UID))
 
 water %>% head()
+water %>% dim()
+water %>% colnames()
+
+# Drinking Water Elements (LLOD)
+df_water_llod_val %>% head()
+df_water_llod_val %>% dim()
 
 ##### Join Data ################################################################
 df_water <- left_join(pregtrak, water, by = "UID")
@@ -48,7 +55,9 @@ df_water %>% sapply(function(x) sum(is.na(x)))
 # (DROP: Observations with All Values Missing [n=4])
 df_water <- df_water %>%
   filter(!is.na(PE_wMetals_As))
+
 df_water %>% dim()
+df_water %>% sapply(function(x) sum(is.na(x)))
 
 # (DROP: Elements with Mass Drift [K, Mg, Na])
 df_water <- df_water %>%
@@ -57,7 +66,9 @@ df_water <- df_water %>%
     -contains("_Mg"), 
     -contains("_Na")
   )
+
 df_water %>% dim()
+df_water %>% sapply(function(x) sum(is.na(x)))
 
 # Values <LLOD
 df_water_llod_ind <- df_water %>%
@@ -87,7 +98,9 @@ df_water <- df_water %>%
     -contains("_Pb"),
     -contains("_Zn")
   )
+
 df_water %>% dim()
+df_water %>% sapply(function(x) sum(is.na(x)))
 
 ##### Address Measurement Error ################################################
 # Drop Aluminum > 50,000 µg/L
@@ -95,6 +108,9 @@ df_water %>% dim()
 #  dissolved via acidification during sample preparation.)
 df_water <- df_water %>%
   filter(PE_wMetals_Al <= 50000)
+
+df_water %>% dim()
+df_water %>% sapply(function(x) sum(is.na(x)))
 
 ##### Prepare Data Objects #####################################################
 # Values: LLOD/√2 (Wide)
@@ -107,7 +123,7 @@ df_water_sqt2 <- df_water_sqt2 %>%
   select(sort(colnames(df_water_sqt2))) %>%
   select(UID, everything())
 
-df_water_sqt2
+df_water_sqt2 %>% head()
 
 # Values: Missing (Wide)
 # (Note: This sets values <LLOD to missing for subsequent imputation.)
@@ -135,14 +151,14 @@ df_water_miss <- df_water_miss %>%
 
 df_water_miss %>% head()
 
+df_water_miss %>% sapply(function(x) sum(is.na(x)))
+
 ##### Check Data ###############################################################
 df_water_sqt2 %>% head()
 df_water_miss %>% head()
 
 dim(df_water_sqt2) == dim(df_water_miss)
 colnames(df_water_sqt2) == colnames(df_water_miss)
-
-df_water_miss %>% sapply(function(x) sum(is.na(x)))
 
 ##### Remove Source Data #######################################################
 rm(list = c("pregtrak","water","df_water"))

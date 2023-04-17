@@ -10,9 +10,7 @@
 library(tidyverse)
 
 ##### Summarize Urinary Arsenobetaine ##########################################
-tmp <- left_join(df_water_sqt2, df_covar, by = "UID")
-
-tmp %>% 
+df_covar %>% 
   select(uAsB) %>% 
   na.omit() %>% 
   summarise(
@@ -21,8 +19,6 @@ tmp %>%
     q1 = quantile(uAsB, 0.25), 
     q3 = quantile(uAsB, 0.75)
   )
-
-rm(tmp)
 
 ##### Check Outliers: Drinking Water ###########################################
 # LLOD/√2
