@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures among Pregnant Women in Rural Northern Bangladesh
+# Identify Element Mixtures -- Prepare Data - Covariates
 
 # Tyler Smith
 # April 4, 2023

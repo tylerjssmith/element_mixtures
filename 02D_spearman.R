@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Spearman's Correlations
+# Identify Element Mixtures -- Spearman's Correlations
 
 # Tyler Smith
 # April 7, 2023

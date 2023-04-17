@@ -1,6 +1,10 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Prepare Data -- Water
+# Identify Element Mixtures -- Prepare Data - Reconcile
+
+# The goal of this script is to confirm the number of drinking water and urinary
+# elements and number of observations to include in the analysis. Data sets are
+# updated to reflect the these decisions.
 
 # Tyler Smith
 # April 4, 2023

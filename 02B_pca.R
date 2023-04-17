@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Principal Components Analysis
+# Identify Element Mixtures -- Principal Components Analysis
 
 # Tyler Smith
 # April 7, 2023
