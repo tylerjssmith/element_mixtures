@@ -143,11 +143,63 @@ pval_tbl1 <- function(x, ...) {
   c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
 }
 
-# Function: Calculate p-value for Spearman's Correlations
-pval_corr <- function(x, y, ...) 
+summary_table_lod <- function(data, filter, group = Element, indicator = Indicator)
 {
-  suppressWarnings(fit <- cor.test(x, y, ...))
-  out <- fit$p.value
-  return(out)
+  # Get Denominator for Percentages
+  d <- data %>%
+    summarise(n = n_distinct(UID)) %>%
+    pull(n)
+  
+  # Get Counts and Percentages
+  data <- data %>%
+    filter(!{{ group }} %in% filter) %>%
+    group_by({{ group }}) %>%
+    count({{ indicator }}) %>%
+    arrange({{ group }}, desc({{ indicator }})) %>%
+    slice_head() %>%
+    mutate(n = ifelse({{ indicator }} == 0, 0, n)) %>%
+    mutate(p = round(n / d * 100, 1))
+  
+  # Format Results
+  data %>%
+    mutate(`<LLOD [n (%)]` = paste0(n, " (", p, ")")) %>%
+    select({{ group }}, `<LLOD [n (%)]`)
+}
+
+summary_table_val <- function(data)
+{
+  # Pivot Longer
+  data <- data %>%
+    pivot_longer(
+      cols = -UID,
+      names_to = "Element"
+    )
+  
+  # Calculate Summary Statistics
+  data <- data %>%
+    group_by(Element) %>%
+    summarise(
+      # Geometric Mean
+       GM    = exp(mean(log(value))),
+      # Geometric Standard Deviation
+       GSD   = exp(sd(log(value))),
+      # Deciles
+      `10th` = quantile(value, 0.10),
+      `20th` = quantile(value, 0.20),
+      `30th` = quantile(value, 0.30),
+      `40th` = quantile(value, 0.40),
+      `50th` = quantile(value, 0.50),
+      `60th` = quantile(value, 0.60),
+      `70th` = quantile(value, 0.70),
+      `80th` = quantile(value, 0.80),
+      `90th` = quantile(value, 0.90)
+    )
+  
+  # Format Output
+  data %>%
+    mutate(across(-Element, ~ ifelse(.x >= 1, round(.x, 1), signif(.x, 1)))) %>%
+    mutate(`GM (GSD)` = paste0(GM, " (", GSD, ")")) %>%
+    select(Element, `GM (GSD)`, everything()) %>%
+    select(-c(GM,GSD))
 }
 

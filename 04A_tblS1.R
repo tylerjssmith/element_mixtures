@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Figure S1
+# Identify Element Mixtures -- Table S1
 
 # Tyler Smith
 # April 4, 2023
@@ -9,21 +9,26 @@
 # Load Packages
 library(tidyverse)
 
-##### Generate Density Plots ###################################################
-# Extract Imputation
-tmp <- complete(impt, action = 1) %>% tibble()
+##### Generate Table ###########################################################
+# Section: LLOD
+tblS1_water_lod_val <- df_water_llod_val %>%
+  filter(!ELEMENT %in% c("Cd","Cu","K","Mg","Na","Pb","Zn")) %>%
+  mutate(LLOD = ifelse(LLOD >= 1, round(LLOD, 1), signif(LLOD, 1))) %>%
+  select(Element = ELEMENT, LLOD) %>%
+  arrange(Element)
 
-# Add Arsenic Indicator; Log Transform Elements
-tmp <- tmp %>%
-  mutate(As1 = ifelse(As > 10, 1, 0)) %>%
-  mutate(across(-c(UID,As1), ~ log(.x)))
+# Section: Values <LLOD
+tblS1_water_lod_np <- df_water_llod_ind %>% 
+  summary_table_lod(filter = c("Cd","Cu","Pb","Zn"))
 
-tmp %>% head()
+# Section: GM, GSD, and Percentiles
+tblS1_water_val <- df_water_sqt2 %>% 
+  summary_table_val()
 
-# Generate Plots
-tmp %>%
-  pivot_longer(-c(UID,As1)) %>%
-  ggplot(aes(x = value, fill = factor(As1))) +
-  geom_density(alpha = 0.4) +
-  facet_wrap(. ~ name, scales = "free") +
-  th
+# Join Table Sections
+tblS1_water <- left_join(tblS1_water_lod_val, tblS1_water_lod_np, by = "Element")
+tblS1_water <- left_join(tblS1_water, tblS1_water_val, by = "Element")
+
+# Review Table
+tblS1_water %>% head()
+

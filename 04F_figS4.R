@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Figure S3
+# Identifying Element Mixtures -- Figure S4
 
 # Tyler Smith
 # April 7, 2023
@@ -8,22 +8,34 @@
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
+library(patchwork)
 
-##### Generate Figure ##########################################################
-# Extract Eigenvalues
-figS3_eigenvalues <- pca_fit$values %>%
-  as_tibble(rownames = "PC") %>%
-  mutate(PC = as.numeric(PC))
+##### Check Imputations ########################################################
+df_urine_miss_nosg %>% sapply(function(x) sum(is.na(x)) >= 1)
 
-# Generate Figure
-(fig_S3 <- figS3_eigenvalues %>%
-  ggplot(aes(x = PC, y = value)) +
-  geom_hline(yintercept = 1, linetype = "dashed") +
-  geom_line() +
-  geom_point() +
-  scale_x_continuous(breaks = seq(1,16,1)) +
-  scale_y_continuous(limits = c(0,6), breaks = seq(0,10,1)) +
-  labs(
-    x = "Principal Component",
-    y = "Eigenvalue") +
-  th)
+# Density Plots
+figS4_Fe <- check_impt_dens(Fe, df_mi = df_urine_impt_nosg, 
+  df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "Fe")
+figS4_Mn <- check_impt_dens(Mn, df_mi = df_urine_impt_nosg, 
+  df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "Mn")
+figS4_Sb <- check_impt_dens(Sb, df_mi = df_urine_impt_nosg, 
+  df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "Sb")
+figS4_V  <- check_impt_dens(V,  df_mi = df_urine_impt_nosg, 
+  df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "V")
+figS4_W  <- check_impt_dens(W,  df_mi = df_urine_impt_nosg, 
+  df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "W")
+
+(figS4_pg1 <- (figS4_Fe + figS4_Mn + figS4_Sb))
+(figS4_pg2 <- (figS4_V + figS4_W))
+
+# Histograms
+check_impt_hist(Fe, df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
+  df_llod = df_urine_llod_val, title = "Iron")
+check_impt_hist(Mn, df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
+  df_llod = df_urine_llod_val, title = "Manganese")
+check_impt_hist(Sb, df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
+  df_llod = df_urine_llod_val, title = "Antimony")
+check_impt_hist(V,  df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
+  df_llod = df_urine_llod_val, title = "Vanadium")
+check_impt_hist(W,  df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
+  df_llod = df_urine_llod_val, title = "Tungsten")

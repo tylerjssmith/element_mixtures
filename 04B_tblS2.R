@@ -1,42 +1,42 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Table S2
+# Identify Element Mixtures -- Table S2
 
 # Tyler Smith
-# April 7, 2023
+# April 4, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-# Join Water and Urine Data
-df_tblS2 <- left_join(df_water_long, df_urine_long, by = c("UID","Element"))
+# Section: LLOD
+tblS2_urine_lod_val <- df_urine_llod_val %>%
+  filter(!ELEMENT %in% c("U")) %>%
+  mutate(LLOD = ifelse(LLOD >= 1, round(LLOD, 1), signif(LLOD, 1))) %>%
+  select(Element = ELEMENT, LLOD) %>%
+  arrange(Element)
 
-df_tblS2 %>%
-  group_by(Element) %>%
-  count(is.na(Urine)) %>% arrange(desc(Element))
+# Section: Values <LLOD
+tblS2_urine_lod_np <- df_urine_llod_ind %>% 
+  summary_table_lod(filter = "U")
 
-# Generate Table
-(tblS2 <- df_tblS2 %>%
-  na.omit() %>%
-  group_by(Element) %>%
-  summarise(
-    n = n(),
-    rho = cor(Water, Urine, method = "spearman"),
-    p = cor_pval(Water, Urine, method = "spearman")
-  ))
+# Section: GM, GSD, and Percentiles
+tblS2_urine_val <- df_urine_sqt2 %>% 
+  summary_table_val()
 
-# Format rho
-(tblS2 <- tblS2 %>%
-  mutate(rho = round(rho, 2)))
+# Join Table Sections
+tblS2_urine <- left_join(tblS2_urine_lod_val, tblS2_urine_lod_np, by = "Element")
+tblS2_urine <- left_join(tblS2_urine, tblS2_urine_val, by = "Element")
 
-# Format p-values
-(tblS2 <- tblS2 %>%
-  mutate(
-    p =
-      ifelse(p >= 0.01,                 round(p, 2),
-      ifelse(p <  0.01    & p > 0.001,  "<0.01",
-      ifelse(p <  0.001   & p > 0.0001, "<0.001",
-      ifelse(p <  0.00001,              "<0.0001", NA))))))
-  
+# Set Arsenic to Missing
+# (Note: Urinary arsenic is the sum of urinary inorganic, monomethyl, and dimethyl
+#  arsenic. The LLOD for each species was 0.05 µg/L. Values of all three species
+#  were ≥LLOD for all participants.)
+tblS2_urine <- tblS2_urine %>%
+  mutate(LLOD = ifelse(Element == "As", NA, LLOD)) %>%
+  mutate(`<LLOD [n (%)]` = ifelse(Element == "As", "0 (0)", `<LLOD [n (%)]`))
+
+# Review Table
+tblS2_urine %>% head()
+
