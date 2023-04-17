@@ -30,7 +30,6 @@ pca_loadings %>% head()
   scale_fill_manual(values = c("lightgray","red")) +
   facet_wrap(. ~ Component, nrow = 1) +
   labs(
-    title = "Principal Components Analysis with Mutiple Imputation",
     fill = "Loading >0.4",
     caption = "m=25") +
   th + 
