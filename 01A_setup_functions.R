@@ -32,6 +32,7 @@ check_discrete <- function(data, x)
 }
 
 ##### Functions: Check Imputations #############################################
+# Function: Density Plots for Imputations
 check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt2, 
   df_llod = df_water_llod_val, title = NULL)
 {
@@ -80,6 +81,7 @@ check_impt_dens <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt
     th + theme(legend.position = "none")
 }
 
+# Function: Histograms for Imputations
 check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt2, 
   df_llod = df_water_llod_val, title = NULL)
 {
@@ -120,6 +122,110 @@ check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt
       y = "Number of Values",
       color = "Imputation") +
     th + theme(legend.position = "none")
+}
+
+##### Functions: Quantile Regression ###########################################
+# Quantile Regression: Point Estimates
+quant_reg_point <- function(data, y, x = "As10", tau = seq(0.1,0.9,0.1), m = 25)
+{
+  # Initialize Results Matrix
+  out <- matrix(nrow = m, ncol = length(tau))
+  
+  # Fit Model to Each Data Set
+  # Store Result in Matrix
+  for(i in 1:m) {
+    df <- data[data$.imp == i,]
+    fit <- rq(get(y) ~ get(x), tau = tau, data = df)
+    res <- coef(fit)[2,]
+    out[i,] <- res
+  }
+  
+  # Format Matrix
+  rownames(out) <- 1:m
+  colnames(out) <- tau
+  
+  out <- as_tibble(out, rownames = ".imp")
+  out <- out %>% 
+    mutate(element = y)
+  out <- out %>% 
+    pivot_longer(
+      cols = -c(element,.imp), 
+      names_to = "tau", 
+      values_to = "estimate"
+    )
+  
+  # Return Matrix
+  return(out)
+}
+
+# Quantile Regression: Bootstrap Estimates
+quant_reg_boot <- function(data, y, x = "As10", tau = seq(0.1,0.9,0.1), m = 25, 
+  R = 1000, verbose = TRUE)
+{
+  # Initialize Results List (All tau)
+  out <- list()
+  
+  # Loop over tau
+  for(t in seq_along(tau)) {
+    
+    # Initialize Results Matrix (Current tau)
+    out_t <- matrix(nrow = R, ncol = m)
+  
+    # Loop over m
+    for(i in 1:m) {
+      df <- data[data$.imp == i,]
+      fit <- with(df, boot.rq(model.matrix(get(y) ~ get(x)), y = get(y), 
+        tau = tau[t], R = R))
+      res <- fit$B[,2]
+      out_t[,i] <- res
+      
+      # Send Update
+      if(verbose) {
+        message(paste(y, ":", i, "/", m, "Imputations for tau =", tau[t]))
+      }
+    }
+    
+    # Store Bootstrap Estimates (Current tau)
+    out[[t]] <- out_t
+  }
+  
+  # Format List (All tau)
+  names(out) <- tau
+  
+  # Return List (All tau)
+  return(out)
+}
+
+# Quantile Regression: Get Estimates for Plotting
+quant_reg <- function(data, y, ...) {
+  # Get Point Estimates
+  tmp_pt <- quant_reg_point(data, y, ...)
+  
+  # Get Bootstrap Estimates
+  tmp_bs  <- quant_reg_boot(data, y, ...)
+ 
+  # Prepare Estimates for Plotting
+  tmp <- cbind(
+    # Point Estimates
+    tmp_pt %>% 
+      group_by(tau) %>% 
+      summarize(mean = mean(estimate)),
+    # Lower Bounds
+    tmp_bs %>% 
+      map_dfr(~ quantile(.x, 0.025), .id = "tau") %>% 
+      select(-tau) %>% 
+      rename(lb = `2.5%`),
+    # Upper Bounds
+    tmp_bs %>% 
+      map_dfr(~ quantile(.x, 0.975), .id = "tau") %>% 
+      select(-tau) %>% 
+      rename(ub = `97.5%`)
+  )
+  
+  tmp <- tmp %>%
+    mutate(y = y)
+  
+  return(tmp)
 }
 
 ##### Functions: Tables and Figures ############################################
