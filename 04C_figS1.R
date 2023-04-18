@@ -29,7 +29,7 @@ df_figS1 %>%
   ) %>%
   arrange(p, Element)
 
-figS1 <- df_figS1 %>%
+(figS1 <- df_figS1 %>%
   ggplot(aes(x = Element, y = p)) +
   geom_hline(yintercept = 50, color = "red") +
   geom_bar(stat = "identity", fill = "lightgray") +
@@ -38,4 +38,4 @@ figS1 <- df_figS1 %>%
     title = "Drinking Water Elements <LLOD",
     x = "Element",
     y = "<LLOD (%)") +
-  th
+  th)

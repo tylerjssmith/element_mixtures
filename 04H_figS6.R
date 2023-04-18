@@ -16,7 +16,7 @@ figS6_eigenvalues <- pca_fit_water$values %>%
   mutate(PC = as.numeric(PC))
 
 # Generate Figure
-(fig_S6 <- figS6_eigenvalues %>%
+(figS6 <- figS6_eigenvalues %>%
   ggplot(aes(x = PC, y = value)) +
   geom_hline(yintercept = 1, linetype = "dashed") +
   geom_line() +

@@ -16,7 +16,7 @@ figS8_eigenvalues <- pca_fit_urine$values %>%
   mutate(PC = as.numeric(PC))
 
 # Generate Figure
-(fig_S8 <- figS8_eigenvalues %>%
+(figS8 <- figS8_eigenvalues %>%
   ggplot(aes(x = PC, y = value)) +
   geom_hline(yintercept = 1, linetype = "dashed") +
   geom_line() +

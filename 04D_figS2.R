@@ -11,7 +11,6 @@ library(tidyverse)
 
 ##### Generate Figure ##########################################################
 df_figS2 <- df_urine_llod_ind %>%
-  filter(Element %in% colnames(df_water_miss)) %>%
   group_by(Element) %>%
   count(Indicator) %>%
   mutate(p = n / sum(n) * 100) %>%
@@ -28,7 +27,7 @@ df_figS2 %>%
       ifelse(p > 30 & p <= 50, ">30-50", 
       ifelse(p > 50,           ">50", NA)))))
   ) %>%
-  arrange(p, Element)
+  arrange(desc(p), Element)
 
 (figS2 <- df_figS2 %>%
   ggplot(aes(x = Element, y = p)) +

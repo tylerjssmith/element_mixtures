@@ -11,19 +11,20 @@ library(tidyverse)
 
 ##### Generate Table ###########################################################
 # Section: LLOD
-tblS2_urine_lod_val <- df_urine_llod_val %>%
+(tblS2_urine_lod_val <- df_urine_llod_val %>%
   filter(!ELEMENT %in% c("U")) %>%
   mutate(LLOD = ifelse(LLOD >= 1, round(LLOD, 1), signif(LLOD, 1))) %>%
   select(Element = ELEMENT, LLOD) %>%
-  arrange(Element)
+  arrange(Element))
 
 # Section: Values <LLOD
-tblS2_urine_lod_np <- df_urine_llod_ind %>% 
-  summary_table_lod(filter = "U")
+(tblS2_urine_lod_np <- df_urine_llod_ind %>% 
+  summary_table_lod(filter = "U"))
 
 # Section: GM, GSD, and Percentiles
-tblS2_urine_val <- df_urine_sqt2 %>% 
-  summary_table_val()
+(tblS2_urine_val <- df_urine_sqt2 %>% 
+  select(-SPECIFICGRAVITY) %>%
+  summary_table_val())
 
 # Join Table Sections
 tblS2_urine <- left_join(tblS2_urine_lod_val, tblS2_urine_lod_np, by = "Element")
