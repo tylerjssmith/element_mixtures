@@ -35,13 +35,6 @@ units(df_covar$wAs)       <- "µg/L"
 units(df_covar$uAs)       <- "µg/L"
 
 # Table
-(tbl1 <- table1(~ AGE + SEGSTAGE + PARITY + EDUCATION + LSI + SEBMI + medSEMUAC + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR | wAs10, 
-  data = df_covar, overall = FALSE, render.continuous = c("Mean (SD)" = "MEAN (SD)"), extra.col = list(`p` = pval_tbl1)))
-
-(tbl1_arsenic <- table1(~ wAs + uAs | wAs10, 
-  data = df_covar, overall = FALSE, render.continuous = c("GM (GSD)" = "GMEAN (GSD)")))
-
-t.test(log(wAs) ~ wAs10, data = df_covar)
-t.test(log(uAs) ~ wAs10, data = df_covar)
-
+(tbl1 <- table1(~ AGE + SEGSTAGE + PARITY + EDUCATION + LSI + SEBMI + medSEMUAC + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR + wAs + uAs | wAs10, 
+  data = df_covar, overall = FALSE, render.continuous = c("Median (IQR)" = "MEDIAN (Q1, Q3)"), extra.col = list(`p` = pval_tbl1)))
   
