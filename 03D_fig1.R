@@ -11,26 +11,54 @@ library(tidyverse)
 
 ##### Generate Figure ##########################################################
 # Extract and Prepare Loadings
-pca_loadings <- unclass(pca_fit$loadings)[,1:4]
+# (Get Loadings for Principal Components with Eigenvalues >1)
+n_pc_water <- sum(pca_fit_water$values > 1)
+pca_loadings_water <- unclass(pca_fit_water$loadings)[,1:n_pc_water]
 
-pca_loadings <- pca_loadings %>%
+# (Convert Loadings to Tibble)
+pca_loadings_water <- pca_loadings_water %>%
   as_tibble(rownames = "Element")
 
-pca_loadings %>% head()  
+# (Label Absolute Value[Loading] >0.4)
+pca_loadings_water <- pca_loadings_water %>%
+  pivot_longer(
+    cols = -Element, 
+    names_to = "Component", 
+    values_to = "Loading"
+  )
+
+pca_loadings_water <- pca_loadings_water %>%
+  mutate(LoadingCat = ifelse(abs(Loading) > 0.4, 1, 0)) %>%
+  mutate(LoadingCat = factor(LoadingCat, levels = c(0,1), 
+    labels = c("No","Yes")))
+
+# Extract and Prepare Percentages of Variance Explained
+pca_pervar_water <- (pca_fit_water$values / sum(pca_fit_water$values))[1:n_pc_water]
+pca_pervar_water <- round(pca_pervar_water * 100, 1)
+
+pca_pervar_water <- tibble(
+  Component = paste0("PC",1:n_pc_water),
+  Percentage = pca_pervar_water
+)
+
+# Combine Loadings and Percentages of Variance Explained
+df_fig1 <- left_join(pca_loadings_water, pca_pervar_water, by = "Component")
+
+df_fig1 <- df_fig1 %>%
+  mutate(ComponentLab = paste0(Component, " (", Percentage, "%)"))
+
+df_fig1 %>% head()
 
 # Generate Figure
-(fig1 <- pca_loadings %>%
-  pivot_longer(-Element, names_to = "Component", values_to = "Loading") %>%
-  mutate(Loading04 = ifelse(Loading > 0.4, 1, 0)) %>%
-  mutate(Loading04 = factor(Loading04, levels = c(0,1), labels = c("No","Yes"))) %>%
-  ggplot(aes(x = Loading, y = Element, fill = Loading04)) +
+(fig1 <- df_fig1 %>%
+  ggplot(aes(x = Loading, y = Element, fill = LoadingCat)) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(limits = c(-1,1), breaks = seq(-0.8,0.8,0.4)) +
+  scale_x_continuous(limits = c(-1,1), breaks = c(-0.4,0.4)) +
   scale_y_discrete(limits = rev) +
-  scale_fill_manual(values = c("lightgray","red")) +
-  facet_wrap(. ~ Component, nrow = 1) +
+  scale_fill_manual(values = c("#d9d9d9","#48494B")) +
+  facet_wrap(. ~ ComponentLab, nrow = 1) +
   labs(
-    fill = "Loading >0.4",
+    fill = "Absolute Value(Loading) >0.4",
     caption = "m=25") +
   th + 
   theme(
