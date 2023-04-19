@@ -10,14 +10,14 @@
 library(tidyverse)
 
 ##### Generate Figure ##########################################################
-df_figS1 <- df_water_llod_ind %>%
+(df_figS1 <- df_water_llod_ind %>%
   group_by(Element) %>%
   count(Indicator) %>%
   mutate(p = n / sum(n) * 100) %>%
   arrange(Element, desc(Indicator)) %>%
   slice_head() %>%
   mutate(p = ifelse(Indicator == 0, 0, p)) %>%
-  ungroup()
+  ungroup())
 
 df_figS1 %>%
   mutate(category = 
@@ -35,7 +35,6 @@ df_figS1 %>%
   geom_bar(stat = "identity", fill = "lightgray") +
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100,10)) +
   labs(
-    title = "Drinking Water Elements <LLOD",
     x = "Element",
     y = "<LLOD (%)") +
   th)

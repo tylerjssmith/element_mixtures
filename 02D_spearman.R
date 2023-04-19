@@ -66,8 +66,8 @@ for(i in 1:m) {
       group_by(Element) %>%
       summarise(
         n = n(),
-        rho = cor(Water, Urine, method = "spearman")
-      )
+        rho = cor(Water, Urine, method = "spearman")) %>%
+      ungroup()
     
     tmp_ij <- tmp_ij %>%
       mutate(i = i) %>%

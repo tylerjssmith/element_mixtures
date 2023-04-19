@@ -9,8 +9,6 @@
 # Load Packages
 library(tidyverse)
 library(quantreg)
-library(broom)
-library(patchwork)
 
 ##### Prepare Data #############################################################
 # Check Data

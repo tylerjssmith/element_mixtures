@@ -35,7 +35,7 @@ df_water_sqt2 %>%
   mutate(p = n / nrow(df_water_sqt2) * 100) %>%
   arrange(desc(n))
 
-# (Boxplots)
+# (Boxplots: Z-Scores)
 df_water_sqt2 %>%
   pivot_longer(-UID, names_to = "Element", values_to = "Water") %>%
   group_by(Element) %>%
@@ -65,7 +65,7 @@ df_water_impt %>%
   mutate(p = n / nrow(df_water_sqt2) * 100) %>%
   arrange(desc(n))
 
-# (Boxplots)
+# (Boxplots: Z-Scores)
 df_water_impt %>%
   filter(.imp == 1) %>%
   pivot_longer(-c(.imp,.id,UID), names_to = "Element", values_to = "Water") %>%
@@ -96,7 +96,7 @@ df_urine_sqt2 %>%
   mutate(p = n / nrow(df_urine_sqt2) * 100) %>%
   arrange(desc(n))
 
-# (Boxplots)
+# (Boxplots: Z-Scores)
 df_urine_sqt2 %>%
   pivot_longer(-c(UID,SPECIFICGRAVITY), names_to = "Element", values_to = "Urine") %>%
   group_by(Element) %>%
@@ -125,7 +125,7 @@ df_urine_impt %>%
   mutate(p = n / nrow(df_urine_sqt2) * 100) %>%
   arrange(desc(n))
 
-# (Boxplots)
+# (Boxplots: Z-Scores)
 df_urine_impt %>%
   filter(.imp == 1) %>%
   pivot_longer(-c(.imp,.id,UID,SPECIFICGRAVITY), names_to = "Element", values_to = "Urine") %>%

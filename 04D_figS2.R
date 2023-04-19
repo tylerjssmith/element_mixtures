@@ -10,14 +10,20 @@
 library(tidyverse)
 
 ##### Generate Figure ##########################################################
-df_figS2 <- df_urine_llod_ind %>%
+(df_figS2 <- df_urine_llod_ind %>%
   group_by(Element) %>%
   count(Indicator) %>%
   mutate(p = n / sum(n) * 100) %>%
   arrange(Element, desc(Indicator)) %>%
   slice_head() %>%
   mutate(p = ifelse(Indicator == 0, 0, p)) %>%
-  ungroup()
+  ungroup())
+
+(df_figS2_as <- tibble(Element = "As", Indicator = 0, n = 778, p = 0))
+
+(df_figS2 <- bind_rows(df_figS2, df_figS2_as))
+
+rm(df_figS2_as)
 
 df_figS2 %>%
   mutate(category = 
@@ -35,7 +41,6 @@ df_figS2 %>%
   geom_bar(stat = "identity", fill = "lightgray") +
   scale_y_continuous(limits = c(0,100), breaks = seq(0,100,10)) +
   labs(
-    title = "Urinary Elements <LLOD",
     x = "Element",
     y = "<LLOD (%)") +
   th)

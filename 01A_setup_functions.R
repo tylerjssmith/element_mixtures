@@ -128,6 +128,8 @@ check_impt_hist <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt
 # Quantile Regression: Point Estimates
 quant_reg_point <- function(data, y, x = "As10", tau = seq(0.1,0.9,0.1), m = 25)
 {
+  require(quantreg)
+  
   # Initialize Results Matrix
   out <- matrix(nrow = m, ncol = length(tau))
   
@@ -160,8 +162,13 @@ quant_reg_point <- function(data, y, x = "As10", tau = seq(0.1,0.9,0.1), m = 25)
 
 # Quantile Regression: Bootstrap Estimates
 quant_reg_boot <- function(data, y, x = "As10", tau = seq(0.1,0.9,0.1), m = 25, 
-  R = 1000, verbose = TRUE)
+  R = 1000, seed = 7023, verbose = TRUE)
 {
+  require(quantreg)
+  
+  # Set Random Seed
+  set.seed(seed)
+  
   # Initialize Results List (All tau)
   out <- list()
   
@@ -231,24 +238,19 @@ quant_reg <- function(data, y, ...) {
 ##### Functions: Tables and Figures ############################################
 # Function: Calculate p-value for Table 1
 pval_tbl1 <- function(x, ...) {
-  # Source: https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
-  # Construct vectors of data y, and groups (strata) g
   y <- unlist(x)
   g <- factor(rep(1:length(x), times=sapply(x, length)))
     
   if (is.numeric(y)) {
-    # For numeric variables, perform a Kruskal-Wallis ranks sum test
     p <- kruskal.test(y ~ g)$p.value
   } else {
-    # For categorical variables, perform a chi-squared test of independence
     p <- chisq.test(table(y, g))$p.value
   }
-    
-  # Format the p-value, using an HTML entity for the less-than sign.
-  # The initial empty string places the output on the line below the variable label.
+
   c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
 }
 
+# Function: Summary Statistics for Tables 2-3, Tables S1-S2
 summary_table_lod <- function(data, filter, group = Element, indicator = Indicator)
 {
   # Get Denominator for Percentages
@@ -272,6 +274,7 @@ summary_table_lod <- function(data, filter, group = Element, indicator = Indicat
     select({{ group }}, `<LLOD [n (%)]`)
 }
 
+# Function: Summary Statistics for Tables 2-3, Tables S1-S2
 summary_table_val <- function(data)
 {
   # Pivot Longer

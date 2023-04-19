@@ -61,7 +61,7 @@ corr_mat_urine <- list()
 
 for(i in 1:m) {
   data <- df_urine_impt_ln_z %>% 
-    filter(.imp == 1) %>% 
+    filter(.imp == i) %>% 
     select(Al:Zn)
   corr_mat_urine[[i]] <- cor(data, method = "pearson")
 }

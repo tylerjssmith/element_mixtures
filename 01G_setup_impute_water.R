@@ -69,6 +69,7 @@ impt_water$loggedEvents
 # Extract Imputed Data Sets
 df_water_impt <- complete(impt_water, action = "long") %>%
   tibble()
+
 df_water_impt %>% head()
 
 
