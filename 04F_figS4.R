@@ -25,9 +25,6 @@ figS4_V  <- check_impt_dens(V,  df_mi = df_urine_impt_nosg,
 figS4_W  <- check_impt_dens(W,  df_mi = df_urine_impt_nosg, 
   df_s2 = df_urine_sqt2_nosg, df_llod = df_urine_llod_val, title = "W")
 
-(figS4_pg1 <- (figS4_Fe + figS4_Mn + figS4_Sb))
-(figS4_pg2 <- (figS4_V + figS4_W))
-
 # Histograms
 check_impt_hist(Fe, df_mi = df_urine_impt_nosg, df_s2 = df_urine_sqt2_nosg, 
   df_llod = df_urine_llod_val, title = "Iron")

@@ -26,9 +26,6 @@ figS3_U  <- check_impt_dens(U,  title = "U")
 figS3_V  <- check_impt_dens(V,  title = "V")
 figS3_W  <- check_impt_dens(W,  title = "W")
 
-(figS3_pg1 <- (figS3_Al + figS3_As + figS3_Br) / (figS3_Fe + figS3_Mo + figS3_P))
-(figS3_pg2 <- (figS3_S + figS3_Sb + figS3_U) / (figS3_V + figS3_W))
-
 # Histograms
 check_impt_hist(Al, title = "Aluminum")
 check_impt_hist(Br, title = "Bromine")
