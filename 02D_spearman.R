@@ -45,7 +45,7 @@ df_urine_impt_long %>%
 
 ##### Estimate Spearman's Correlations #########################################
 # Initialize Results Data Frame
-df_figS9 <- data.frame()
+df_tblS3 <- data.frame()
 
 # Loop Over 1 to ith Drinking Water Data Sets
 # Loop Over 1 to jth Urinary Data Sets
@@ -77,12 +77,12 @@ for(i in 1:m) {
     
   }
   
-  df_figS9 <- rbind(df_figS9, out_j)
+  df_tblS3 <- rbind(df_tblS3, out_j)
   
 }
 
 ##### Summarize Results ########################################################
-df_figS9 %>%
+df_tblS3 %>%
   group_by(Element) %>%
   summarise(
     n = n(),
@@ -90,6 +90,4 @@ df_figS9 %>%
     min = min(rho),
     max = max(rho),
     range = signif(max - min, 1)
-  ) %>%
-  arrange(desc(range))
-
+  )
