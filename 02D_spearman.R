@@ -3,7 +3,7 @@
 # Identify Element Mixtures -- Spearman's Correlations
 
 # Tyler Smith
-# April 7, 2023
+# April 23, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
@@ -13,9 +13,9 @@ library(tidyverse)
 # Drinking Water Elements
 df_water_impt_long <- df_water_impt %>%
   as_tibble() %>%
-  select(-.id) %>%
+  select(-c(.imp,.id)) %>%
   pivot_longer(
-    cols = -c(.imp,UID),
+    cols = -UID,
     names_to = "Element",
     values_to = "Water"
   )
@@ -23,9 +23,9 @@ df_water_impt_long <- df_water_impt %>%
 # Urinary Elements
 df_urine_impt_long <- df_urine_impt %>%
   as_tibble() %>%
-  select(-c(.id,SPECIFICGRAVITY)) %>%
+  select(-c(.imp,.id,SPECIFICGRAVITY)) %>%
   pivot_longer(
-    cols = -c(.imp,UID),
+    cols = -UID,
     names_to = "Element",
     values_to = "Urine"
   )
@@ -34,60 +34,23 @@ df_water_impt_long %>% head()
 df_urine_impt_long %>% head()
 
 df_water_impt_long %>%
-  group_by(.imp, Element) %>%
+  group_by(Element) %>%
   summarise(n = n()) %>%
-  filter(n != 778)
+  filter(n != 774)
 
 df_urine_impt_long %>%
-  group_by(.imp, Element) %>%
+  group_by(Element) %>%
   summarise(n = n()) %>%
-  filter(n != 778)
+  filter(n != 774)
 
 ##### Estimate Spearman's Correlations #########################################
-# Initialize Results Data Frame
-df_tblS3 <- data.frame()
+df_tblS8 <- inner_join(df_water_impt_long, df_urine_impt_long, 
+  by = c("UID","Element"))
 
-# Loop Over 1 to ith Drinking Water Data Sets
-# Loop Over 1 to jth Urinary Data Sets
-for(i in 1:m) {
-  
-  out_j <- data.frame()
-  
-  for(j in 1:m) {
-    
-    tmp_water <- df_water_impt_long[df_water_impt_long$.imp == i,]
-    tmp_urine <- df_urine_impt_long[df_urine_impt_long$.imp == j,]
-    
-    tmp_ij <- left_join(tmp_water, tmp_urine, 
-      by = c("UID","Element"))
-    
-    tmp_ij <- tmp_ij %>%
-      na.omit() %>%
-      group_by(Element) %>%
-      summarise(
-        n = n(),
-        rho = cor(Water, Urine, method = "spearman")) %>%
-      ungroup()
-    
-    tmp_ij <- tmp_ij %>%
-      mutate(i = i) %>%
-      mutate(j = j)
-    
-    out_j <- rbind(out_j, tmp_ij)
-    
-  }
-  
-  df_tblS3 <- rbind(df_tblS3, out_j)
-  
-}
-
-##### Summarize Results ########################################################
-df_tblS3 %>%
+df_tblS8 <- df_tblS8 %>%
   group_by(Element) %>%
   summarise(
     n = n(),
-    median = median(rho),
-    min = min(rho),
-    max = max(rho),
-    range = signif(max - min, 1)
-  )
+    rho = cor(Water, Urine, method = "spearman"))
+
+df_tblS8 %>% head()

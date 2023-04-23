@@ -51,6 +51,9 @@ sum(!df_urine_miss_nosg$UID %in% df_urine_sqt2_nosg$UID)
 included_uid <- inner_join(df_water_miss %>% select(UID), 
   df_urine_miss_nosg %>% select(UID), by = "UID")
 
+included_uid <- inner_join(included_uid,
+  df_covar %>% na.omit() %>% select(UID), by = "UID")
+
 # Restrict Data to Included UID
 # (Drinking Water Values)
 df_water_miss <- left_join(included_uid, df_water_miss, by = "UID")

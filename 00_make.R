@@ -8,28 +8,20 @@
 ##### 01 Setup #################################################################
 setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 
-# Functions
+# Functions and Themes
 source("01A_setup_functions.R")
-
-# Themes
 source("01B_setup_themes.R")
 
-# Data - Water
+# Data - Prepare
 source("01C_setup_data_water.R")
-
-# Data - Urine
 source("01D_setup_data_urine.R")
-
-# Data - Covariates
 source("01E_setup_data_covar.R")
 
 # Data - Reconcile
 source("01F_setup_data_reconcile.R")
 
-# Data - Water - Impute
+# Data - Impute
 source("01G_setup_impute_water.R")
-
-# Data - Urine - Impute
 source("01H_setup_impute_urine.R")
 
 ##### 02 Analysis ##############################################################
@@ -38,64 +30,56 @@ setwd("~/Desktop/research/manuscripts/smith_etal_pair_mixtures/code/")
 # Exploratory Data Analysis
 source("02A_explore.R")
 
-# Principal Component Analyses
-source("02B_pca.R")
-
-# Quantile Regression
-source("02C_quantreg.R")
+# Principal Components Analysis
+source("02B_pca_loadings.R")
+source("02C_pca_scores.R")
 
 # Spearman's Correlations
 source("02D_spearman.R")
 
 ##### 03 Tables and Figures ####################################################
-# Table 1 
-# (Participant Characteristics)
-source("03A_table1.R")
+# Table 1-2
+# (Summary Statistics)
+source("03A_tbl1.R")
+source("03B_tbl2.R")
 
-# Table 2
-# (Summary Statistics -- Multiple Imputation)
-source("03B_table2.R")
-source("03C_table3.R")
+# Figures 1-2
+# (Principal Component Loadings)
+source("03C_fig1.R")
+source("03D_fig2.R")
 
-# Figures 1-2 
-# (Loadings)
-source("03D_fig1.R")
-source("03E_fig2.R")
-
-# Figure 3
-# (Quantile Regression)
+# Figures 3-4
+# (Principal Component Scores)
+#source("03E_fig3.R")
+#source("03F_fig4.R")
 
 ##### 04 Supplemental Tables and Figures #######################################
-# Tables S1-S2 
-# (Summary Statistics -- LLOD/√2)
+# Table S1
+# (LLOD)
 source("04A_tblS1.R")
+
+# Tables S2-S3
+# (Correlation Matrices)
 source("04B_tblS2.R")
+source("04C_tblS3.R")
 
-# Figures S1-S2 
-# (Percentages <LLOD)
-source("04C_figS1.R")
-source("04D_figS2.R")
+# Tables S4-S5
+# (Principal Component Loadings)
+source("04D_tblS4.R")
+source("04E_tblS5.R")
 
-# Figures S3-S4 
-# (Imputation Checks)
-source("04E_figS3.R")
-source("04F_figS4.R")
+# Tables S6-S7
+# (Principal Component Scores)
+#source("04F_tblS6.R")
+#source("04G_tblS7.R")
 
-# Figures S5-S6 
-# (PCA -- Drinking Water)
-source("04G_figS5.R")
-source("04H_figS6.R")
-
-# Figures S7-S8 
-# (PCA -- Urine)
-source("04I_figS7.R")
-source("04J_figS8.R")
-
-# Figure S9 
+# Table S8
 # (Spearman's Correlations)
-source("04K_figS9.R")
+source("04H_tblS8.R")
 
 ##### Export Figures ###########################################################
+# Export Tables and Figures
+source("../tables_figures/export_tables_figures.R")
 
 
 

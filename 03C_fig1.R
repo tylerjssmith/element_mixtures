@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Figure 2
+# Identify Element Mixtures -- Figure 1
 
 # Tyler Smith
 # April 4, 2023
@@ -8,49 +8,40 @@
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
-library(scales)
 
-##### Extract and Prepare Loadings #############################################
-# Get Loadings for Principal Components with Eigenvalues >1
-n_pc_urine <- sum(pca_fit_urine$values > 1)
-pca_loadings_urine <- unclass(pca_fit_urine$loadings)[,1:n_pc_urine]
-
-# Convert Loadings to Tibble
-pca_loadings_urine <- pca_loadings_urine %>%
-  as_tibble(rownames = "Element")
-
-# Label Absolute Value(Loading) >0.4
-pca_loadings_urine <- pca_loadings_urine %>%
+##### Generate Figure ##########################################################
+# Label Absolute Value[Loading] >0.4
+pca_loadings_water_long <- pca_loadings_water %>%
   pivot_longer(
     cols = -Element, 
     names_to = "Component", 
     values_to = "Loading"
   )
-  
-pca_loadings_urine <- pca_loadings_urine %>%
+
+pca_loadings_water_long <- pca_loadings_water_long %>%
   mutate(LoadingCat = ifelse(abs(Loading) > 0.4, 1, 0)) %>%
   mutate(LoadingCat = factor(LoadingCat, levels = c(0,1), 
     labels = c("No","Yes")))
 
-##### Extract and Prepare Percentages of Variance Explained ####################
-pca_pervar_urine <- (pca_fit_urine$values / sum(pca_fit_urine$values))[1:n_pc_urine]
-pca_pervar_urine <- round(pca_pervar_urine * 100, 1)
+# Extract and Prepare Percentages of Variance Explained
+pca_pervar_water <- (pca_fit_water$values / sum(pca_fit_water$values))[1:n_pc_water]
+pca_pervar_water <- round(pca_pervar_water * 100, 1)
 
-pca_pervar_urine <- tibble(
-  Component = paste0("PC",1:n_pc_urine),
-  Percentage = pca_pervar_urine
+pca_pervar_water <- tibble(
+  Component = paste0("PC",1:n_pc_water),
+  Percentage = pca_pervar_water
 )
 
 # Combine Loadings and Percentages of Variance Explained
-df_fig2 <- left_join(pca_loadings_urine, pca_pervar_urine, by = "Component")
+df_fig1 <- left_join(pca_loadings_water_long, pca_pervar_water, by = "Component")
 
-df_fig2 <- df_fig2 %>%
+df_fig1 <- df_fig1 %>%
   mutate(ComponentLab = paste0(Component, " (", Percentage, "%)"))
 
-df_fig2 %>% head()
+df_fig1 %>% head()
 
-##### Generate Figure ##########################################################
-(fig2 <- df_fig2 %>%
+# Generate Figure
+(fig1 <- df_fig1 %>%
   ggplot(aes(x = Loading, y = Element, fill = LoadingCat)) +
   geom_bar(stat = "identity") +
   scale_x_continuous(limits = c(-1,1), breaks = c(-0.4,0.4)) +

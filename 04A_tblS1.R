@@ -10,25 +10,35 @@
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-# Section: LLOD
-tblS1_water_lod_val <- df_water_llod_val %>%
-  filter(!ELEMENT %in% c("Cd","Cu","K","Mg","Na","Pb","Zn")) %>%
+# Drinking Water
+# (LLOD)
+(tmp_tblS1a <- df_water_llod_val %>%
+  filter(!ELEMENT %in% c("K","Mg","Na")) %>%
   mutate(LLOD = ifelse(LLOD >= 1, round(LLOD, 1), signif(LLOD, 1))) %>%
   select(Element = ELEMENT, LLOD) %>%
-  arrange(Element)
+  arrange(Element))
 
-# Section: Values <LLOD
-tblS1_water_lod_np <- df_water_llod_ind %>% 
-  summary_table_lod(filter = c("Cd","Cu","Pb","Zn"))
+# (Values <LLOD)
+(tmp_tblS1b <- df_water_llod_ind %>% 
+  tblS2_llod(filter = c("K","Mg","Na")))
 
-# Section: GM, GSD, and Percentiles
-tblS1_water_val <- df_water_sqt2 %>% 
-  summary_table_val()
+# Urine
+# (LLOD)
+(tmp_tblS1c <- df_urine_llod_val %>%
+  mutate(LLOD = ifelse(LLOD >= 1, round(LLOD, 1), signif(LLOD, 1))) %>%
+  mutate(LLOD = ifelse(ELEMENT == "As", NA, LLOD)) %>%
+  select(Element = ELEMENT, LLOD) %>%
+  arrange(Element))
+
+# (Values <LLOD)
+(tmp_tblS1d <- df_urine_llod_ind %>% 
+  tblS2_llod(filter = NULL))
+
+(tmp_tblS1_water <- left_join(tmp_tblS1a, tmp_tblS1b, by = "Element"))
+(tmp_tblS1_urine <- left_join(tmp_tblS1c, tmp_tblS1d, by = "Element"))
 
 # Join Table Sections
-tblS1_water <- left_join(tblS1_water_lod_val, tblS1_water_lod_np, by = "Element")
-tblS1_water <- left_join(tblS1_water, tblS1_water_val, by = "Element")
+(tblS1 <- right_join(tmp_tblS1_water, tmp_tblS1_urine, by = "Element"))
 
-# Review Table
-tblS1_water %>% head()
-
+rm(list = c("tmp_tblS1a","tmp_tblS1b","tmp_tblS1c","tmp_tblS1d",
+  "tmp_tblS1_water","tmp_tblS1_urine"))

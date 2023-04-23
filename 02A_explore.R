@@ -50,7 +50,7 @@ df_water_sqt2 %>%
   theme_bw() +
   th
 
-# Imputation 1
+# Stochastic
 # (Counts)
 df_water_impt %>%
   filter(.imp == 1) %>%
@@ -110,10 +110,9 @@ df_urine_sqt2 %>%
     y = "Log(Concentration)") +
   th
 
-# Imputation 1
+# Stochastic
 # (Counts)
 df_urine_impt %>%
-  filter(.imp == 1) %>%
   pivot_longer(-c(.imp,.id,UID,SPECIFICGRAVITY), names_to = "Element", values_to = "Urine") %>%
   group_by(Element) %>%
   mutate(Urine = scale(log(Urine))) %>%
@@ -127,7 +126,6 @@ df_urine_impt %>%
 
 # (Boxplots: Z-Scores)
 df_urine_impt %>%
-  filter(.imp == 1) %>%
   pivot_longer(-c(.imp,.id,UID,SPECIFICGRAVITY), names_to = "Element", values_to = "Urine") %>%
   group_by(Element) %>%
   mutate(Urine = scale(log(Urine))) %>%

@@ -1,25 +1,15 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Table S2
+# Identify Element Mixtures -- Table S8
 
 # Tyler Smith
-# April 4, 2023
+# April 23, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-(tblS2 <- df_water_impt_ln_z %>% cor())
-
-(tblS2 <- ifelse(lower.tri(tblS2), tblS2, NA))
-
-diag(tblS2) <- rep(1, 16)
-
-colnames(tblS2) <- colnames(df_water_impt_ln_z)
-
-tblS2 <- tblS2 %>% as_tibble(rownames = "Element")
-
-tblS2$Element <- colnames(tblS2)[-1]
-
-tblS2
+(tblS8 <- df_tblS8 %>%
+  mutate(rho = round(rho, 2)) %>%
+  mutate(rho = format(rho, nsmall = 2)))

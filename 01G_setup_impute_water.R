@@ -21,7 +21,7 @@ df_water_miss %>% dim()
 set.seed(7023)
 
 # Imputations (m)
-m <- 25
+m <- 1
 
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID is not used for imputation.)
@@ -71,7 +71,7 @@ df_water_impt <- complete(impt_water, action = "long") %>%
   tibble()
 
 df_water_impt %>% head()
-
+df_water_impt %>% dim()
 
 
 

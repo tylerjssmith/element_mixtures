@@ -114,9 +114,42 @@ df_covar %>%
     title = "Age"
   )
 
+df_covar <- df_covar %>%
+  mutate(
+    AGE3 = 
+      ifelse(AGE  < 20,            0,
+      ifelse(AGE >= 20 & AGE < 30, 1,
+      ifelse(AGE >= 30,            2, NA)))
+  )
+
+df_covar %>%
+  group_by(AGE3) %>%
+  summarise(
+    n = n(),
+    min = min(AGE),
+    max = max(AGE)
+  )
+
+df_covar <- df_covar %>%
+  mutate(AGE3 = factor(AGE3,
+    levels = c(0,1,2),
+    labels = c("14 to <20","20 to <30","30 to <43")))
+
+df_covar %>%
+  check_discrete(AGE3)
+
 # Gestational Age
 df_covar <- df_covar %>%
   mutate(SEGSTAGE = SEWKINT - BGLMPWK)
+
+df_covar <- df_covar %>%
+  mutate(SEGSTAGE = ifelse(SEGSTAGE < 13, 13, SEGSTAGE)) %>%
+  mutate(SEGSTAGE = ifelse(SEGSTAGE > 16, 16, SEGSTAGE))
+
+df_covar <- df_covar %>%
+  mutate(SEGSTAGE = factor(SEGSTAGE,
+    levels = c(13,14,15,16),
+    labels = c("11 to 13","14","15","16 to 17")))
 
 df_covar %>%
   check_discrete(SEGSTAGE)
@@ -151,6 +184,15 @@ df_covar %>%
     title = "Living Standards Index"
   )
 
+df_covar <- df_covar %>%
+  mutate(LSI2 = ntile(LSI, 2))
+
+df_covar <- df_covar %>%
+  mutate(LSI2 = factor(LSI2, levels = c(1,2), labels = c("≤Median",">Median")))
+
+df_covar %>%
+  check_discrete(LSI2)
+
 # Body Mass Index (BMI)
 df_covar %>%
   check_continuous(
@@ -158,6 +200,21 @@ df_covar %>%
     xlab = expression("Body Mass Index (kg/m" ^ 2 * ")"),
     title = "Body Mass Index"
   )
+
+df_covar <- df_covar %>%
+  mutate(
+    SEBMI3 = 
+      ifelse(SEBMI < 18.5, 0,
+      ifelse(SEBMI >= 18.5 & SEBMI < 25, 1,
+      ifelse(SEBMI >= 25, 2, NA))))
+
+df_covar <- df_covar %>%
+  mutate(SEBMI3 = factor(SEBMI3,
+    levels = c(0,1,2),
+    labels = c("<18.5","18.5 to <25",">25")))
+
+df_covar %>% 
+  check_discrete(SEBMI3)
 
 # Mid-upper Arm Circumference (MUAC)
 df_covar %>%
@@ -244,8 +301,8 @@ df_covar %>%
 
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, SEGSTAGE, PARITY, EDUCATION, LSI, SEBMI, medSEMUAC,
-    PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, wAs, uAs, wAs10, uAsB)
+  select(UID, AGE, AGE3, SEGSTAGE, PARITY, EDUCATION, LSI, LSI2, SEBMI, SEBMI3, 
+    medSEMUAC, PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, wAs, uAs, wAs10, uAsB)
 
 df_covar %>%
   sapply(function(x) sum(is.na(x)))

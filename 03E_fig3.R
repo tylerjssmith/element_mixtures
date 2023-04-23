@@ -1,21 +1,16 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identifying Element Mixtures -- Table S3
+# Identify Element Mixtures -- Figure 3
 
 # Tyler Smith
-# April 7, 2023
+# April 4, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
+library(scales)
 
 ##### Generate Figure ##########################################################
-(tblS3 <- df_tblS3 %>%
-  group_by(Element) %>%
-  summarise(
-    Mean = mean(rho),
-    Minimum = min(rho),
-    Maximum = max(rho),
-    Range = signif(Maximum - Minimum, 1)
-  ))
+
+
 

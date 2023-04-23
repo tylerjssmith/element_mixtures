@@ -26,7 +26,7 @@ df_urine_miss_nosg %>% dim()
 set.seed(7023)
 
 # Imputations (m)
-m <- 25
+m <- 1
 
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID and SPECIFICGRAVITY are not used for imputation.)
@@ -75,6 +75,7 @@ impt_urine_nosg$loggedEvents
 df_urine_impt_nosg <- complete(impt_urine_nosg, action = "long") %>% 
   tibble()
 df_urine_impt_nosg %>% head()
+df_urine_impt_nosg %>% dim()
 
 ##### Apply Specific Gravity Correction to Urinary Elements ####################
 # LLOD/√2: Wide
@@ -88,7 +89,5 @@ df_urine_sqt2 <- df_urine_sqt2_nosg %>%
 df_urine_impt_nosg %>% head()
 
 df_urine_impt <- df_urine_impt_nosg %>%
-  group_by(.imp) %>%
-  mutate(across(-c(.id,UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / 
-      (SPECIFICGRAVITY - 1))) %>%
-  ungroup()
+  mutate(across(-c(.imp,.id,UID,SPECIFICGRAVITY,As), ~ .x * (mean(SPECIFICGRAVITY) - 1) / 
+      (SPECIFICGRAVITY - 1)))
