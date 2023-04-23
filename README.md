@@ -17,8 +17,8 @@ This repository contains R code for an analysis of element mixtures among pregna
 
 ## 02 Analysis
 * [Analysis: Explore](02A_explore.R)
-* [Analysis: Principal Components Analysis](02B_pca.R)
-* [Analysis: Quantile Regression](02C_quantreg.R)
+* [Analysis: Principal Components Analysis - Loadings](02B_pca_loadings.R) 
+* [Analysis: Principal Components Analysis - Scores](02C_pca_scores.R) 
 * [Analysis: Spearman's Correlations](02D_spearman.R)
 
 ## 03 Tables and Figures
