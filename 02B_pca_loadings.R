@@ -62,6 +62,11 @@ pca_loadings_urine <- pca_loadings_urine %>%
   as_tibble(rownames = "Element")
 pca_loadings_urine %>% head()
 
+# Flip Signs of PC5 Loadings so Arsenic Loading is Positive
+# (Note: In PCA, the solution is unique up to a sign flip. Flipping the sign
+#  has no effect but, in this case, will improve interpretability.)
+pca_loadings_urine <- pca_loadings_urine %>% 
+  mutate(PC5 = PC5 * -1)
 
 
 

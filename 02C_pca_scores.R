@@ -48,11 +48,23 @@ tbl3 <- df_tbl3 %>%
 
 tbl3 %>% head()
 
+# Adjusted Models
+tidy(lm(PC1 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
+tidy(lm(PC2 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
+tidy(lm(PC3 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
+tidy(lm(PC4 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
+
 ##### Urinary Elements #########################################################
 # Extract and Join Scores
 pca_scores_urine <- pca_fit_urine$scores %>% 
   as_tibble() %>% 
   select(PC1:PC7)
+
+# Flip Signs of PC5 Scores so Scores for Component with Arsenic Are Positive
+# (Note: In PCA, the solution is unique up to a sign flip. Flipping the sign
+#  has no effect but, in this case, will improve interpretability.)
+pca_scores_urine <- pca_scores_urine %>% 
+  mutate(PC5 = PC5 * -1)
 
 pca_scores_urine %>% head()
 pca_scores_urine %>% dim()
