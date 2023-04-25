@@ -124,6 +124,28 @@ tbl1_tbl2 <- function(data, x, from, to) {
   return(data)
 }
 
+# Function: Calculate p-values for Tables 1-2
+tbl1_tbl2_pval <- function(data, x, y) {
+  # Initialize Results Vector
+  out <- numeric(length = length(y))
+  
+  # Calculate p-values via Kruskal-Wallis Test
+  for(i in 1:length(y)) {
+    out[i] <- with(data, kruskal.test(get(y[i]), get(x))$p.value)
+  }
+  
+  # Format p-values
+  out <- ifelse(out >= 0.01,                  round(out, 2), 
+         ifelse(out  < 0.01  & out >= 0.001,  "<0.01", 
+         ifelse(out  < 0.001 & out >= 0.0001, "<0.001", "<0.0001")))
+  
+  # Accomodate Row Names in Tables 1-2
+  out <- c(NA,NA,out)
+  
+  # Return Results
+  return(out)
+}
+
 # Function: Summary Statistics (LLOD) for Table S1
 tblS2_llod <- function(data, filter, group = Element, indicator = Indicator)
 {
