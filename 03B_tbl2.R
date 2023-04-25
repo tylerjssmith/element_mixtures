@@ -10,12 +10,11 @@
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-df_tbl2 <- left_join(df_covar, df_urine_impt, by = "UID") %>%
-  select(-c(wAs,uAs,wAs10,uAsB,.imp,.id))
+df_tbl2 <- left_join(df_covar, df_urine_impt, by = "UID")
 
 df_tbl2 %>% head()
 
-tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","SEBMI3","PESTICIDE","PETOBAC","PEBETEL","PEHCIGAR")
+tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","medSEMUAC4","PESTICIDE","PETOBAC","PEBETEL","PEHCIGAR")
 tmp_y_urine <- df_tbl2 %>% select(Al:Zn) %>% colnames()
 
 tbl2 <- rbind(
@@ -39,9 +38,9 @@ tbl2 <- rbind(
   df_tbl2 %>% tbl_gm(x = LSI4, from = Al, to = Zn),
   df_tbl2 %>% tbl_pval(y = tmp_y_urine, x = "LSI4"),
   
-  # Body Mass Index
-  df_tbl2 %>% tbl_gm(x = SEBMI3, from = Al, to = Zn),
-  df_tbl2 %>% tbl_pval(y = tmp_y_urine, x = "SEBMI3"),
+  # Mid-upper Arm Circumference
+  df_tbl2 %>% tbl_gm(x = medSEMUAC4, from = Al, to = Zn),
+  df_tbl2 %>% tbl_pval(y = tmp_y_urine, x = "medSEMUAC4"),
   
   # Pesticide Use
   df_tbl2 %>% tbl_gm(x = PESTICIDE, from = Al, to = Zn),

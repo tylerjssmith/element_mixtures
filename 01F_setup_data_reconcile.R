@@ -70,4 +70,62 @@ df_urine_llod_ind <- left_join(included_uid, df_urine_llod_ind, by = "UID")
 # (Participant Characteristics)
 df_covar <- left_join(included_uid, df_covar, by = "UID")
 
+##### Calculate Relative Measures on Final Sample ##############################
+# Age: IQR Units
+df_covar <- df_covar %>%
+  mutate(AGEIQR = AGE / IQR(AGE, na.rm = TRUE))
+
+df_covar %>%
+  check_continuous(
+    x = AGEIQR, 
+    xlab = "Age (IQR Units)", 
+    title = "Age"
+  )
+
+# Living Standards Index: Quartiles
+df_covar <- df_covar %>%
+  mutate(LSI4 = ntile(LSI, 4))
+
+df_covar <- df_covar %>%
+  mutate(LSI4 = factor(LSI4, levels = c(1:4), 
+    labels = c("Quartile 1","Quartile 2","Quartile 3","Quartile 4")))
+
+df_covar %>%
+  check_discrete(LSI4)
+
+# Living Standards Index: IQR Units
+df_covar <- df_covar %>%
+  mutate(LSIIQR = LSI / IQR(LSI))
+
+df_covar %>%
+  check_continuous(
+    x = LSIIQR, 
+    xlab = "Living Standards Index (IQR Units)", 
+    title = "Living Standards Index"
+  )
+
+# Mid-upper Arm Circumference: Quartiles
+df_covar <- df_covar %>%
+  mutate(medSEMUAC4 = ntile(medSEMUAC, 4))
+
+df_covar <- df_covar %>%
+  mutate(medSEMUAC4 = factor(medSEMUAC4, levels = c(1:4), 
+    labels = c("Quartile 1","Quartile 2","Quartile 3","Quartile 4")))
+
+df_covar %>%
+  check_discrete(medSEMUAC4)
+
+# Mid-upper Arm Circumference: IQR Units
+df_covar <- df_covar %>%
+  mutate(medSEMUACIQR = medSEMUAC / IQR(medSEMUAC))
+
+df_covar %>%
+  check_continuous(
+    x = medSEMUACIQR, 
+    xlab = "Mid-upper Arm Circumference (IQR Units)", 
+    title = "Mid-upper Arm Circumference"
+  )
+
+
+
 

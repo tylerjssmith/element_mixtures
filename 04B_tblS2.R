@@ -12,8 +12,8 @@ library(tidyverse)
 ##### Generate Table ###########################################################
 df_tbl1 %>% head()
 
-tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","SEBMI3","PESTICIDE",
-  "PETOBAC","PEBETEL","PEHCIGAR")
+tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","medSEMUAC4",
+  "PESTICIDE","PETOBAC","PEBETEL","PEHCIGAR")
 tmp_y_water <- df_tbl1 %>% select(Al:W) %>% colnames()
 
 tblS2 <- rbind(
@@ -37,8 +37,8 @@ tblS2 <- rbind(
   df_tbl1 %>% tbl_median_iqr(x = LSI4, 
     from = Al, to = W),
 
-  # Body Mass Index
-  df_tbl1 %>% tbl_median_iqr(x = SEBMI3, 
+  # Mid-upper Arm Circumference
+  df_tbl1 %>% tbl_median_iqr(x = medSEMUAC4, 
     from = Al, to = W),
 
   # Pesticide Use

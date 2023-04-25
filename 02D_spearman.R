@@ -44,13 +44,13 @@ df_urine_impt_long %>%
   filter(n != 774)
 
 ##### Estimate Spearman's Correlations #########################################
-df_tblS8 <- inner_join(df_water_impt_long, df_urine_impt_long, 
+df_tblS10 <- inner_join(df_water_impt_long, df_urine_impt_long, 
   by = c("UID","Element"))
 
-df_tblS8 <- df_tblS8 %>%
+df_tblS10 <- df_tblS10 %>%
   group_by(Element) %>%
   summarise(
     n = n(),
     rho = cor(Water, Urine, method = "spearman"))
 
-df_tblS8 %>% head()
+df_tblS10 %>% head()

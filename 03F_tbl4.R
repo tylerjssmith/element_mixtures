@@ -3,22 +3,29 @@
 # Identify Element Mixtures -- Table 4
 
 # Tyler Smith
-# April 4, 2023
+# April 23, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
-library(scales)
 
 ##### Generate Table ###########################################################
 tbl4 <- df_tbl4 %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ round(.x, 2))) %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ format(.x, nsmall = 2))) %>%
-  mutate(p.value = ifelse(p.value >= 0.01, round(p.value, 2), ifelse(p.value < 0.01 & p.value >= 0.001, "<0.01", ifelse(p.value < 0.001, "<0.001", p.value)))) %>%
-  mutate(est = paste0(estimate, " (", conf.low, ", ", conf.high, ")")) %>%
-  pivot_wider(id_cols = c(x,term), names_from = y, values_from = c(est,p.value)) %>%
-  mutate(across(est_PC1:p.value_PC7, ~ ifelse(term == "(Intercept)", "Reference", .x))) %>%
-  select(x, term, ends_with("PC1"), ends_with("PC2"), ends_with("PC3"), ends_with("PC4"), ends_with("PC5"), ends_with("PC6"), ends_with("PC7"))
+  select(-c(std.error,statistic)) %>%
+  pivot_wider(id_cols = term, names_from = y, 
+    values_from = c(estimate,conf.low,conf.high,p.value)) %>%
+  select(term, ends_with("PC1"), ends_with("PC2"), ends_with("PC3"), 
+    ends_with("PC4"), ends_with("PC5"), ends_with("PC6"), ends_with("PC7")) %>%
+  mutate(across(-term, ~ format(round(.x, 2), nsmall = 2))) %>%
+  mutate(PC1 = paste0(estimate_PC1, " (", conf.low_PC1, ", ", conf.high_PC1, ")")) %>%
+  mutate(PC2 = paste0(estimate_PC2, " (", conf.low_PC2, ", ", conf.high_PC2, ")")) %>%
+  mutate(PC3 = paste0(estimate_PC3, " (", conf.low_PC3, ", ", conf.high_PC3, ")")) %>%
+  mutate(PC4 = paste0(estimate_PC4, " (", conf.low_PC4, ", ", conf.high_PC4, ")")) %>%
+  mutate(PC5 = paste0(estimate_PC5, " (", conf.low_PC5, ", ", conf.high_PC5, ")")) %>%
+  mutate(PC6 = paste0(estimate_PC6, " (", conf.low_PC6, ", ", conf.high_PC6, ")")) %>%
+  mutate(PC7 = paste0(estimate_PC7, " (", conf.low_PC7, ", ", conf.high_PC7, ")")) %>%
+  select(term, PC1, p.value_PC1, PC2, p.value_PC2, PC3, p.value_PC3,  
+    PC4, p.value_PC4, PC5, p.value_PC5, PC6, p.value_PC6, PC7, p.value_PC7)
 
 tbl4 %>% head()
-
+tbl4 %>% dim()

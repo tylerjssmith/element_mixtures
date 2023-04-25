@@ -102,7 +102,7 @@ df_covar %>% head()
 # Remove Source Data
 rm(list = c("pregtrak","pefsst","parity","ses","pef","urine","water"))
 
-##### Prepare Data #############################################################
+##### Age ######################################################################
 # Age
 df_covar <- df_covar %>%
   mutate(AGE = year(SEDATE) - DOBYY)
@@ -114,20 +114,22 @@ df_covar %>%
     title = "Age"
   )
 
+df_covar %>%
+  select(AGE) %>%
+  na.omit() %>%
+  summarise(
+    n = n(),
+    min = min(AGE),
+    max = max(AGE)
+  )
+
+# Categories: Age
 df_covar <- df_covar %>%
   mutate(
     AGE3 = 
       ifelse(AGE  < 20,            0,
       ifelse(AGE >= 20 & AGE < 30, 1,
       ifelse(AGE >= 30,            2, NA)))
-  )
-
-df_covar %>%
-  group_by(AGE3) %>%
-  summarise(
-    n = n(),
-    min = min(AGE),
-    max = max(AGE)
   )
 
 df_covar <- df_covar %>%
@@ -138,10 +140,16 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(AGE3)
 
+##### Gestational Age ##########################################################
 # Gestational Age
 df_covar <- df_covar %>%
   mutate(SEGSTAGE = SEWKINT - BGLMPWK)
 
+df_covar %>%
+  count(SEGSTAGE)
+
+# Categories: Gestational Age
+# (Note: Variable was winsorized to limit influence of extreme values.)
 df_covar <- df_covar %>%
   mutate(SEGSTAGE = ifelse(SEGSTAGE < 13, 13, SEGSTAGE)) %>%
   mutate(SEGSTAGE = ifelse(SEGSTAGE > 16, 16, SEGSTAGE))
@@ -154,10 +162,12 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(SEGSTAGE)
 
+##### Parity ###################################################################
 # Parity
 df_covar <- df_covar %>%
   mutate(PARITY = ifelse(PARITY > 2, 2, PARITY))
 
+# Categories: Parity
 df_covar <- df_covar %>%
   mutate(PARITY = factor(PARITY, levels = c(0:2), 
     labels = c("Nulliparous","Primiparous","Multiparous")))
@@ -165,10 +175,12 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(PARITY)
 
+##### Education ################################################################
 # Education
 df_covar <- df_covar %>%
   mutate(EDUCATION = ifelse(EDUCATION > 2, 2, EDUCATION))
 
+# Categories: Education
 df_covar <- df_covar %>%
   mutate(EDUCATION = factor(EDUCATION, levels = c(0:2), 
     labels = c("None","Class 1-9","Class ≥10")))
@@ -176,6 +188,7 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(EDUCATION)
 
+##### Living Standards Index ###################################################
 # Living Standards Index
 df_covar %>%
   check_continuous(
@@ -184,46 +197,22 @@ df_covar %>%
     title = "Living Standards Index"
   )
 
-df_covar <- df_covar %>%
-  mutate(LSI4 = ntile(LSI, 4))
-
-df_covar <- df_covar %>%
-  mutate(LSI4 = factor(LSI4, levels = c(1:4), labels = c("Q1","Q2","Q3","Q4")))
-
-df_covar %>%
-  check_discrete(LSI4)
-
-# Body Mass Index (BMI)
-df_covar %>%
-  check_continuous(
-    x = SEBMI,
-    xlab = expression("Body Mass Index (kg/m" ^ 2 * ")"),
-    title = "Body Mass Index"
-  )
-
-df_covar <- df_covar %>%
-  mutate(
-    SEBMI3 = 
-      ifelse(SEBMI < 18.5, 0,
-      ifelse(SEBMI >= 18.5 & SEBMI < 25, 1,
-      ifelse(SEBMI >= 25, 2, NA))))
-
-df_covar <- df_covar %>%
-  mutate(SEBMI3 = factor(SEBMI3,
-    levels = c(0,1,2),
-    labels = c("Underweight (<18.5)","Normal (18.5-<25)",
-      "Overweight/Obese (>25)")))
-
-df_covar %>% 
-  check_discrete(SEBMI3)
-
-# Mid-upper Arm Circumference (MUAC)
+##### Mid-upper Arm Circumference (MUAC) #######################################
+# Mid-upper Arm Circumference
 df_covar %>%
   check_continuous(
     x = medSEMUAC,
     xlab = expression("Mid-upper Arm Circumference (MUAC)"),
     title = "Mid-upper Arm Circumference"
   )
+
+##### Pesticide Use ############################################################
+# Source Variables
+df_covar %>%
+  check_discrete(PEMIXPEST)
+
+df_covar %>%
+  check_discrete(PESPRAYPEST)
 
 # Pesticide Use
 df_covar <- df_covar %>%
@@ -234,13 +223,9 @@ df_covar <- df_covar %>%
     labels = c("No","Yes")))
 
 df_covar %>%
-  check_discrete(PEMIXPEST)
-df_covar %>%
-  check_discrete(PESPRAYPEST)
-df_covar %>%
   check_discrete(PESTICIDE)
 
-# Chewing Tobacco
+##### Chewing Tobacco ##########################################################
 df_covar <- df_covar %>%
   mutate(PETOBAC = as.numeric(PETOBAC))
 
@@ -251,7 +236,7 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(PETOBAC)
 
-# Betel Nut
+##### Betel Nut ################################################################
 df_covar <- df_covar %>%
   mutate(PEBETEL = factor(PEBETEL, levels = c(0:1), 
     labels = c("No","Yes")))
@@ -259,7 +244,7 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(PEBETEL)
 
-# Husband's Smoking
+##### Husband's Smoking ########################################################
 df_covar <- df_covar %>%
   mutate(PEHCIGAR = factor(PEHCIGAR, levels = c(0:1), 
     labels = c("No","Yes")))
@@ -267,14 +252,7 @@ df_covar <- df_covar %>%
 df_covar %>%
   check_discrete(PEHCIGAR)
 
-# Urinary Arsenobetaine
-df_covar %>%
-  check_continuous(
-    log(uAsB), 
-    xlab = "Log(∑uAs)", 
-    title = "Urinary Arsenic (∑uAs)"
-  )
-
+##### Urinary Arsenobetaine ####################################################
 df_covar %>%
   check_continuous(
     log(uAsB), 
@@ -282,28 +260,10 @@ df_covar %>%
     title = "Urinary Arsenobetaine"
   )
 
-# Drinking Water Arsenic
-df_covar %>%
-  check_continuous(
-    log(wAs), 
-    xlab = "Log(Drinking Water Arsenic)", 
-    title = "Drinking Water Arsenic"
-  )
-
-df_covar <- df_covar %>%
-  mutate(wAs10 = ifelse(wAs > 10, 1, 0))
-
-df_covar <- df_covar %>%
-  mutate(wAs10 = factor(wAs10, levels = c(0:1), 
-    labels = c("≤10",">10")))
-
-df_covar %>%
-  check_discrete(wAs10)
-
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, AGE3, SEGSTAGE, PARITY, EDUCATION, LSI, LSI4, SEBMI, SEBMI3, 
-    medSEMUAC, PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, wAs, uAs, wAs10, uAsB)
+  select(UID, AGE, AGE3, SEGSTAGE, PARITY, EDUCATION, LSI, medSEMUAC, 
+    PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, uAsB)
 
 df_covar %>%
   sapply(function(x) sum(is.na(x)))

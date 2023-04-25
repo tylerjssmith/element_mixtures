@@ -49,7 +49,7 @@ source("03C_fig1.R")
 source("03D_fig2.R")
 
 # Tables 3-4
-# (Principal Component Scores)
+# (Principal Component Scores - Adjusted)
 source("03E_tbl3.R")
 source("03F_tbl4.R")
 
@@ -73,9 +73,14 @@ source("04E_tblS5.R")
 source("04F_tblS6.R")
 source("04G_tblS7.R")
 
-# Table S8
-# (Spearman's Correlations)
+# Tables S8-S9
+# (Principal Component Scores - Unadjusted)
 source("04H_tblS8.R")
+source("04I_tblS9.R")
+
+# Table S10
+# (Spearman's Correlations)
+source("04J_tblS10.R")
 
 ##### Export Figures ###########################################################
 # Export Tables and Figures
