@@ -20,6 +20,15 @@ df_covar %>%
     q3 = quantile(uAsB, 0.75)
   )
 
+##### Summarize Participant Characteristics ####################################
+df_covar %>%
+  summarise(
+    n = n(),
+    median = median(AGE),
+    q1 = quantile(AGE, 0.25),
+    q3 = quantile(AGE, 0.75)
+  )
+
 ##### Check Outliers: Drinking Water ###########################################
 # LLOD/√2
 # (Counts)
