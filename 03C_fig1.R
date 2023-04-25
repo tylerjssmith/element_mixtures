@@ -25,7 +25,7 @@ pca_loadings_water_long <- pca_loadings_water_long %>%
 
 # Extract and Prepare Percentages of Variance Explained
 pca_pervar_water <- (pca_fit_water$values / sum(pca_fit_water$values))[1:n_pc_water]
-pca_pervar_water <- round(pca_pervar_water * 100, 1)
+pca_pervar_water <- format(round(pca_pervar_water * 100, 1), nsmall = 1)
 
 pca_pervar_water <- tibble(
   Component = paste0("PC",1:n_pc_water),
@@ -36,7 +36,8 @@ pca_pervar_water <- tibble(
 df_fig1 <- left_join(pca_loadings_water_long, pca_pervar_water, by = "Component")
 
 df_fig1 <- df_fig1 %>%
-  mutate(ComponentLab = paste0(Component, " (", Percentage, "%)"))
+  mutate(ComponentLab = paste0(Component, " (", Percentage, "%)")) %>%
+  mutate(ComponentLab = gsub("\\( ", "(", ComponentLab))
 
 df_fig1 %>% head()
 
@@ -44,7 +45,7 @@ df_fig1 %>% head()
 (fig1 <- df_fig1 %>%
   ggplot(aes(x = Loading, y = Element, fill = LoadingCat)) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(limits = c(-1,1), breaks = c(-0.4,0.4)) +
+  scale_x_continuous(limits = c(-1,1), breaks = seq(-0.8,0.8,0.4)) +
   scale_y_discrete(limits = rev) +
   scale_fill_manual(values = c("#d9d9d9","#48494B")) +
   facet_wrap(. ~ ComponentLab, nrow = 1) +
@@ -53,6 +54,7 @@ df_fig1 %>% head()
   th + 
   theme(
     panel.grid.major.x = element_line(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"))
 
 

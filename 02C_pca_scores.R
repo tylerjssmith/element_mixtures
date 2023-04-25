@@ -14,7 +14,7 @@ library(psych)
 # Extract and Join Scores
 pca_scores_water <- pca_fit_water$scores %>% 
   as_tibble() %>% 
-  select(PC1:PC4)
+  select(all_of(1:n_pc_water))
 
 pca_scores_water %>% head()
 pca_scores_water %>% dim()
@@ -36,35 +36,11 @@ df_tbl3 <- rbind(
   df_covar_scores_water %>% lm_pca_scores(y = "PC4")
 )
 
-# Generate Table
-tbl3 <- df_tbl3 %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ round(.x, 2))) %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ format(.x, nsmall = 2))) %>%
-  mutate(p.value = ifelse(p.value >= 0.01, round(p.value, 2), ifelse(p.value < 0.01 & p.value >= 0.001, "<0.01", ifelse(p.value < 0.001, "<0.001", p.value)))) %>%
-  mutate(est = paste0(estimate, " (", conf.low, ", ", conf.high, ")")) %>%
-  pivot_wider(id_cols = c(x,term), names_from = y, values_from = c(est,p.value)) %>%
-  mutate(across(est_PC1:p.value_PC4, ~ ifelse(term == "(Intercept)", "Reference", .x))) %>%
-  select(x, term, ends_with("PC1"), ends_with("PC2"), ends_with("PC3"), ends_with("PC4"))
-
-tbl3 %>% head()
-
-# Adjusted Models
-tidy(lm(PC1 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
-tidy(lm(PC2 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
-tidy(lm(PC3 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
-tidy(lm(PC4 ~ AGE3 + SEGSTAGE + PARITY + EDUCATION + LSI2 + SEBMI3 + PESTICIDE + PETOBAC + PEBETEL + PEHCIGAR, data = df_covar_scores_water))
-
 ##### Urinary Elements #########################################################
 # Extract and Join Scores
 pca_scores_urine <- pca_fit_urine$scores %>% 
   as_tibble() %>% 
-  select(PC1:PC7)
-
-# Flip Signs of PC5 Scores so Scores for Component with Arsenic Are Positive
-# (Note: In PCA, the solution is unique up to a sign flip. Flipping the sign
-#  has no effect but, in this case, will improve interpretability.)
-pca_scores_urine <- pca_scores_urine %>% 
-  mutate(PC5 = PC5 * -1)
+  select(all_of(1:n_pc_urine))
 
 pca_scores_urine %>% head()
 pca_scores_urine %>% dim()
@@ -74,6 +50,13 @@ df_covar_scores_urine <- cbind(df_covar, pca_scores_urine) %>%
 
 df_covar_scores_urine <- df_covar_scores_urine %>%
   select(-c(UID,AGE,LSI,SEBMI,medSEMUAC,wAs,uAs,wAs10,uAsB))
+
+# (Reverse Sign on PC5)
+# (Notes: In PCA, the solution is unique up to a sign flip. Here, the signs
+#  on PC5 loadings and scores were reversed so that As, Mo, and W load
+#  positively, which improves interpretability.)
+df_covar_scores_urine <- df_covar_scores_urine %>%
+  mutate(PC5 = PC5 * -1)
 
 df_covar_scores_urine %>% head()
 df_covar_scores_urine %>% dim()
@@ -89,14 +72,3 @@ df_tbl4 <- rbind(
   df_covar_scores_urine %>% lm_pca_scores(y = "PC7", ymax = PC7)
 )
 
-# Generate Table
-tbl4 <- df_tbl4 %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ round(.x, 2))) %>%
-  mutate(across(c(estimate,conf.low,conf.high), ~ format(.x, nsmall = 2))) %>%
-  mutate(p.value = ifelse(p.value >= 0.01, round(p.value, 2), ifelse(p.value < 0.01 & p.value >= 0.001, "<0.01", ifelse(p.value < 0.001, "<0.001", p.value)))) %>%
-  mutate(est = paste0(estimate, " (", conf.low, ", ", conf.high, ")")) %>%
-  pivot_wider(id_cols = c(x,term), names_from = y, values_from = c(est,p.value)) %>%
-  mutate(across(est_PC1:p.value_PC7, ~ ifelse(term == "(Intercept)", "Reference", .x))) %>%
-  select(x, term, ends_with("PC1"), ends_with("PC2"), ends_with("PC3"), ends_with("PC4"), ends_with("PC5"), ends_with("PC6"), ends_with("PC7"))
-
-tbl4 %>% head()

@@ -10,16 +10,53 @@
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-(tblS2 <- df_water_impt_ln_z %>% cor())
+df_tbl1 %>% head()
 
-(tblS2 <- ifelse(lower.tri(tblS2), tblS2, NA))
+tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","SEBMI3","PESTICIDE",
+  "PETOBAC","PEBETEL","PEHCIGAR")
+tmp_y_water <- df_tbl1 %>% select(Al:W) %>% colnames()
 
-diag(tblS2) <- rep(1, 16)
+tblS2 <- rbind(
+  # Age
+  df_tbl1 %>% tbl_median_iqr(x = AGE3, 
+    from = Al, to = W),
 
-colnames(tblS2) <- colnames(df_water_impt_ln_z)
+  # Gestational Age
+  df_tbl1 %>% tbl_median_iqr(x = SEGSTAGE, 
+    from = Al, to = W),
 
-tblS2 <- tblS2 %>% as_tibble(rownames = "Element")
+  # Parity
+  df_tbl1 %>% tbl_median_iqr(x = PARITY, 
+    from = Al, to = W),
 
-tblS2$Element <- colnames(tblS2)[-1]
+  # Education
+  df_tbl1 %>% tbl_median_iqr(x = EDUCATION, 
+    from = Al, to = W),
 
-tblS2
+  # Living Standards Index
+  df_tbl1 %>% tbl_median_iqr(x = LSI4, 
+    from = Al, to = W),
+
+  # Body Mass Index
+  df_tbl1 %>% tbl_median_iqr(x = SEBMI3, 
+    from = Al, to = W),
+
+  # Pesticide Use
+  df_tbl1 %>% tbl_median_iqr(x = PESTICIDE, 
+    from = Al, to = W),
+
+  # Chewing Tobacco Use
+  df_tbl1 %>% tbl_median_iqr(x = PETOBAC, 
+    from = Al, to = W),
+
+  # Betel Nut Use
+  df_tbl1 %>% tbl_median_iqr(x = PEBETEL, 
+    from = Al, to = W),
+
+  # Husband's Smoking at Home
+  df_tbl1 %>% tbl_median_iqr(x = PEHCIGAR, 
+    from = Al, to = W)
+)
+
+tblS2 %>% head()
+tblS2 %>% dim()

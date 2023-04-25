@@ -28,6 +28,9 @@ set.seed(7023)
 # Imputations (m)
 m <- 1
 
+# Iterations (maxit)
+it <- 100
+
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID and SPECIFICGRAVITY are not used for imputation.)
 tmp <- df_urine_miss_nosg %>% ncol()
@@ -65,7 +68,7 @@ urine_llod_mice <- urine_llod_mice %>% pull(LLOD)
 urine_llod_mice
 
 ##### Conduct Multiple Imputation ##############################################
-impt_urine_nosg <- mice(df_urine_miss_nosg, m = m, method = "leftcenslognorm", 
+impt_urine_nosg <- mice(df_urine_miss_nosg, m = m, maxit = it, method = "leftcenslognorm", 
   predictorMatrix = mice_predictors_urine, lod = urine_llod_mice)
 
 # Check Logged Events

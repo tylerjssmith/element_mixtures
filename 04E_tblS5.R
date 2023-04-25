@@ -1,39 +1,25 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Table S5
+# Identify Element Mixtures -- Table S3
 
 # Tyler Smith
-# April 4, 2023
+# April 7, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
 
-##### Generate Table ###########################################################
-# Loadings
-tmp1 <- pca_loadings_urine %>%
-  mutate(across(PC1:PC7, ~ round(.x, 2)))
+##### Generate Figure ##########################################################
+(tblS5 <- df_urine_impt_ln_z %>% cor())
 
-# Eigenvalue, Proportion of Variance, Cumulative Proportion
-tmp2 <- round(pca_fit_urine$values[1:n_pc_urine], 2)
-tmp3 <- round(pca_fit_urine$values[1:n_pc_urine] / sum(pca_fit_urine$values) * 100, 2)
-tmp4 <- round(cumsum(tmp3), 2)
+(tblS5 <- ifelse(lower.tri(tblS5), tblS5, NA))
 
-tmp2 <- c("Eigenvalue", tmp2)
-tmp3 <- c("Proportion of Variance (%)", tmp3)
-tmp4 <- c("Cumulative Proportion (%)", tmp4)
+diag(tblS5) <- rep(1, 26)
 
-# Combine Rows
-tblS5 <- rbind(
-  tmp1,
-  tmp2,
-  tmp3,
-  tmp4
-)
+colnames(tblS5) <- colnames(df_urine_impt_ln_z)
 
-tblS5 %>% head()
-tblS5 %>% tail()
+tblS5 <- tblS5 %>% as_tibble(rownames = "Element")
 
-# Remove Intermediate Objects
-rm(list = c("tmp1","tmp2","tmp3","tmp4"))
+tblS5$Element <- colnames(tblS5)[-1]
 
+tblS5

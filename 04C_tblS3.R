@@ -3,23 +3,50 @@
 # Identify Element Mixtures -- Table S3
 
 # Tyler Smith
-# April 7, 2023
+# April 4, 2023
 
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
 
-##### Generate Figure ##########################################################
-(tblS3 <- df_urine_impt_ln_z %>% cor())
+##### Generate Table ###########################################################
+df_tbl2 %>% head()
 
-(tblS3 <- ifelse(lower.tri(tblS3), tblS3, NA))
+tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","SEBMI3","PESTICIDE",
+  "PETOBAC","PEBETEL","PEHCIGAR")
+tmp_y_urine <- df_tbl2 %>% select(Al:Zn) %>% colnames()
 
-diag(tblS3) <- rep(1, 26)
+tblS3 <- rbind(
+  # Age
+  df_tbl2 %>% tbl_median_iqr(x = AGE3, from = Al, to = Zn),
 
-colnames(tblS3) <- colnames(df_urine_impt_ln_z)
+  # Gestational Age
+  df_tbl2 %>% tbl_median_iqr(x = SEGSTAGE, from = Al, to = Zn),
 
-tblS3 <- tblS3 %>% as_tibble(rownames = "Element")
+  # Parity
+  df_tbl2 %>% tbl_median_iqr(x = PARITY, from = Al, to = Zn),
 
-tblS3$Element <- colnames(tblS3)[-1]
+  # Education
+  df_tbl2 %>% tbl_median_iqr(x = EDUCATION, from = Al, to = Zn),
 
-tblS3
+  # Living Standards Index
+  df_tbl2 %>% tbl_median_iqr(x = LSI4, from = Al, to = Zn),
+
+  # Body Mass Index
+  df_tbl2 %>% tbl_median_iqr(x = SEBMI3, from = Al, to = Zn),
+
+  # Pesticide Use
+  df_tbl2 %>% tbl_median_iqr(x = PESTICIDE, from = Al, to = Zn),
+
+  # Chewing Tobacco Use
+  df_tbl2 %>% tbl_median_iqr(x = PETOBAC, from = Al, to = Zn),
+
+  # Betel Nut Use
+  df_tbl2 %>% tbl_median_iqr(x = PEBETEL, from = Al, to = Zn),
+
+  # Husband's Smoking at Home
+  df_tbl2 %>% tbl_median_iqr(x = PEHCIGAR, from = Al, to = Zn)
+)
+
+tblS3 %>% head()
+tblS3 %>% dim()

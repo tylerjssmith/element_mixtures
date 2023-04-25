@@ -26,7 +26,7 @@ pca_loadings_urine_long <- pca_loadings_urine_long %>%
 
 ##### Extract and Prepare Percentages of Variance Explained ####################
 pca_pervar_urine <- (pca_fit_urine$values / sum(pca_fit_urine$values))[1:n_pc_urine]
-pca_pervar_urine <- round(pca_pervar_urine * 100, 1)
+pca_pervar_urine <- format(round(pca_pervar_urine * 100, 1), nsmall = 1)
 
 pca_pervar_urine <- tibble(
   Component = paste0("PC",1:n_pc_urine),
@@ -37,7 +37,8 @@ pca_pervar_urine <- tibble(
 df_fig2 <- left_join(pca_loadings_urine_long, pca_pervar_urine, by = "Component")
 
 df_fig2 <- df_fig2 %>%
-  mutate(ComponentLab = paste0(Component, " (", Percentage, "%)"))
+  mutate(ComponentLab = paste0(Component, " (", Percentage, "%)")) %>%
+  mutate(ComponentLab = gsub("\\( ", "(", ComponentLab))
 
 df_fig2 %>% head()
 
@@ -45,7 +46,7 @@ df_fig2 %>% head()
 (fig2 <- df_fig2 %>%
   ggplot(aes(x = Loading, y = Element, fill = LoadingCat)) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(limits = c(-1,1), breaks = c(-0.4,0.4)) +
+  scale_x_continuous(limits = c(-1,1), breaks = seq(-0.8,0.8,0.4)) +
   scale_y_discrete(limits = rev) +
   scale_fill_manual(values = c("#d9d9d9","#48494B")) +
   facet_wrap(. ~ ComponentLab, nrow = 1) +
@@ -54,6 +55,7 @@ df_fig2 %>% head()
   th + 
   theme(
     panel.grid.major.x = element_line(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"))
 
 

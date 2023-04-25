@@ -81,9 +81,103 @@ check_impute <- function(element, df_mi = df_water_impt, df_s2 = df_water_sqt2,
     th + theme(legend.position = "none")
 }
 
-##### Functions: Tables and Figures ############################################
-# Function: Generate Tables 1-2
-tbl1_tbl2 <- function(data, x, from, to) {
+##### Functions: Tables 1-2 ####################################################
+# Function: Get Geometric Means by Participant Characteristic
+tbl_gm <- function(data, x, from, to) 
+{
+  # Select and Pivot Data
+  data <- data %>%
+    select({{ x }}, {{ from }}:{{ to }}) %>%
+    pivot_longer(
+      cols = -{{ x }}, 
+      names_to = "Element", 
+      values_to = "Conc"
+    )
+  
+  # Calculate Median (IQR)
+  data <- data %>%
+    group_by(Element, {{ x }}) %>%
+    summarise(
+      n = n(),
+      gm = exp(mean(log(Conc)))
+    )
+  
+  # Format and Concatenate Median (IQR)
+  data <- data %>%
+    mutate(gm = ifelse(gm > 1, 
+      format(round(gm, 1),  nsmall = 1), 
+      format(signif(gm, 2), nsmall = 2)))
+  
+  # Pivot Data; Calculate Proportions
+  data <- data %>%
+    select(Element, {{ x }}, n, gm) %>%
+    pivot_wider(id_cols = c({{ x }}, n), names_from = Element, 
+      values_from = gm) %>%
+    mutate(p = n / sum(n) * 100) %>%
+    mutate(p = round(p, 1)) %>%
+    mutate(p = paste0(n, " (", p, ")"))
+  
+  # Select and Arrange Columns
+  data <- data %>%
+    select(-n) %>%
+    select(covar = {{ x }}, p, everything())
+  
+  return(data)
+}
+
+# Function: Calculate p-values via One-way ANOVA for Tables 1-2
+tbl_pval <- function(data, x, y) 
+{
+  # Initialize Results Vector
+  out <- numeric(length = length(y))
+  
+  # Calculate p-values via Kruskal-Wallis Test
+  for(i in 1:length(y)) {
+    fit <- anova(lm(log(get(y[i])) ~ get(x), data = data))
+    out[i] <- fit$`Pr(>F)`[1]
+  }
+  
+  # Format p-values
+  out <- ifelse(out >= 0.01,                  round(out, 2), 
+         ifelse(out  < 0.01  & out >= 0.001,  "<0.01", 
+         ifelse(out  < 0.001 & out >= 0.0001, "<0.001", "<0.0001")))
+  
+  # Accomodate Row Names in Tables 1-2
+  out <- c(NA,NA,out)
+  
+  # Return Results
+  return(out)
+}
+
+##### Functions: Table S1 ######################################################
+# Function: Summary Statistics (LLOD) for Table S1
+tbl_llod <- function(data, filter, group = Element, indicator = Indicator)
+{
+  # Get Denominator for Percentages
+  d <- data %>%
+    summarise(n = n_distinct(UID)) %>%
+    pull(n)
+  
+  # Get Counts and Percentages
+  data <- data %>%
+    filter(!{{ group }} %in% filter) %>%
+    group_by({{ group }}) %>%
+    count({{ indicator }}) %>%
+    arrange({{ group }}, desc({{ indicator }})) %>%
+    slice_head() %>%
+    mutate(n = ifelse({{ indicator }} == 0, 0, n)) %>%
+    mutate(p = round(n / d * 100, 1))
+  
+  # Format Results
+  data %>%
+    mutate(`<LLOD [n (%)]` = paste0(n, " (", p, ")")) %>%
+    select({{ group }}, `<LLOD [n (%)]`)
+}
+
+##### Functions: Tables S2-S3 ##################################################
+# Function: Get Medians (Interquartile Ranges) by Participant Characteristic
+tbl_median_iqr <- function(data, x, from, to) 
+{
   # Select and Pivot Data
   data <- data %>%
     select({{ x }}, {{ from }}:{{ to }}) %>%
@@ -124,54 +218,10 @@ tbl1_tbl2 <- function(data, x, from, to) {
   return(data)
 }
 
-# Function: Calculate p-values for Tables 1-2
-tbl1_tbl2_pval <- function(data, x, y) {
-  # Initialize Results Vector
-  out <- numeric(length = length(y))
-  
-  # Calculate p-values via Kruskal-Wallis Test
-  for(i in 1:length(y)) {
-    out[i] <- with(data, kruskal.test(get(y[i]), get(x))$p.value)
-  }
-  
-  # Format p-values
-  out <- ifelse(out >= 0.01,                  round(out, 2), 
-         ifelse(out  < 0.01  & out >= 0.001,  "<0.01", 
-         ifelse(out  < 0.001 & out >= 0.0001, "<0.001", "<0.0001")))
-  
-  # Accomodate Row Names in Tables 1-2
-  out <- c(NA,NA,out)
-  
-  # Return Results
-  return(out)
-}
-
-# Function: Summary Statistics (LLOD) for Table S1
-tblS2_llod <- function(data, filter, group = Element, indicator = Indicator)
-{
-  # Get Denominator for Percentages
-  d <- data %>%
-    summarise(n = n_distinct(UID)) %>%
-    pull(n)
-  
-  # Get Counts and Percentages
-  data <- data %>%
-    filter(!{{ group }} %in% filter) %>%
-    group_by({{ group }}) %>%
-    count({{ indicator }}) %>%
-    arrange({{ group }}, desc({{ indicator }})) %>%
-    slice_head() %>%
-    mutate(n = ifelse({{ indicator }} == 0, 0, n)) %>%
-    mutate(p = round(n / d * 100, 1))
-  
-  # Format Results
-  data %>%
-    mutate(`<LLOD [n (%)]` = paste0(n, " (", p, ")")) %>%
-    select({{ group }}, `<LLOD [n (%)]`)
-}
-
+##### Functions: Tables 3-4 ####################################################
 # Function: Linear Models for Principal Component Scores
-lm_pca_scores <- function(data, y, ymin = PC1, ymax = PC4) {
+lm_pca_scores <- function(data, y, ymin = PC1, ymax = PC4) 
+{
   data %>%
     select(-c({{ ymin }}:{{ ymax }})) %>%
     map(~ lm(get(y) ~ .x, data = data)) %>%

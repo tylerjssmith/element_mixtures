@@ -1,6 +1,6 @@
 ################################################################################
 # Pregnancy, Arsenic, and Immune Response (PAIR) Study
-# Identify Element Mixtures -- Table S4
+# Identify Element Mixtures -- Table S2
 
 # Tyler Smith
 # April 4, 2023
@@ -10,30 +10,16 @@
 library(tidyverse)
 
 ##### Generate Table ###########################################################
-# Loadings
-tmp1 <- pca_loadings_water %>%
-  mutate(across(PC1:PC4, ~ round(.x, 2)))
+(tblS4 <- df_water_impt_ln_z %>% cor())
 
-# Eigenvalue, Proportion of Variance, Cumulative Proportion
-tmp2 <- round(pca_fit_water$values[1:n_pc_water], 2)
-tmp3 <- round(pca_fit_water$values[1:n_pc_water] / sum(pca_fit_water$values) * 100, 2)
-tmp4 <- round(cumsum(tmp3), 2)
+(tblS4 <- ifelse(lower.tri(tblS4), tblS4, NA))
 
-tmp2 <- c("Eigenvalue", tmp2)
-tmp3 <- c("Proportion of Variance (%)", tmp3)
-tmp4 <- c("Cumulative Proportion (%)", tmp4)
+diag(tblS4) <- rep(1, 16)
 
-# Combine Rows
-tblS4 <- rbind(
-  tmp1,
-  tmp2,
-  tmp3,
-  tmp4
-)
+colnames(tblS4) <- colnames(df_water_impt_ln_z)
 
-tblS4 %>% head()
-tblS4 %>% tail()
+tblS4 <- tblS4 %>% as_tibble(rownames = "Element")
 
-# Remove Intermediate Objects
-rm(list = c("tmp1","tmp2","tmp3","tmp4"))
+tblS4$Element <- colnames(tblS4)[-1]
 
+tblS4

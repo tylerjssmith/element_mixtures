@@ -20,7 +20,7 @@ library(tidyverse)
 
 # (Values <LLOD)
 (tmp_tblS1b <- df_water_llod_ind %>% 
-  tblS2_llod(filter = c("K","Mg","Na")))
+  tbl_llod(filter = c("K","Mg","Na")))
 
 # Urine
 # (LLOD)
@@ -32,7 +32,7 @@ library(tidyverse)
 
 # (Values <LLOD)
 (tmp_tblS1d <- df_urine_llod_ind %>% 
-  tblS2_llod(filter = NULL))
+  tbl_llod(filter = NULL))
 
 (tmp_tblS1_water <- left_join(tmp_tblS1a, tmp_tblS1b, by = "Element"))
 (tmp_tblS1_urine <- left_join(tmp_tblS1c, tmp_tblS1d, by = "Element"))

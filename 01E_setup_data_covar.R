@@ -133,7 +133,7 @@ df_covar %>%
 df_covar <- df_covar %>%
   mutate(AGE3 = factor(AGE3,
     levels = c(0,1,2),
-    labels = c("14 to <20","20 to <30","30 to <43")))
+    labels = c("14-19","20-29","30-43")))
 
 df_covar %>%
   check_discrete(AGE3)
@@ -149,7 +149,7 @@ df_covar <- df_covar %>%
 df_covar <- df_covar %>%
   mutate(SEGSTAGE = factor(SEGSTAGE,
     levels = c(13,14,15,16),
-    labels = c("11 to 13","14","15","16 to 17")))
+    labels = c("11-13","14","15","16-17")))
 
 df_covar %>%
   check_discrete(SEGSTAGE)
@@ -185,13 +185,13 @@ df_covar %>%
   )
 
 df_covar <- df_covar %>%
-  mutate(LSI2 = ntile(LSI, 2))
+  mutate(LSI4 = ntile(LSI, 4))
 
 df_covar <- df_covar %>%
-  mutate(LSI2 = factor(LSI2, levels = c(1,2), labels = c("≤Median",">Median")))
+  mutate(LSI4 = factor(LSI4, levels = c(1:4), labels = c("Q1","Q2","Q3","Q4")))
 
 df_covar %>%
-  check_discrete(LSI2)
+  check_discrete(LSI4)
 
 # Body Mass Index (BMI)
 df_covar %>%
@@ -211,7 +211,8 @@ df_covar <- df_covar %>%
 df_covar <- df_covar %>%
   mutate(SEBMI3 = factor(SEBMI3,
     levels = c(0,1,2),
-    labels = c("<18.5","18.5 to <25",">25")))
+    labels = c("Underweight (<18.5)","Normal (18.5-<25)",
+      "Overweight/Obese (>25)")))
 
 df_covar %>% 
   check_discrete(SEBMI3)
@@ -301,7 +302,7 @@ df_covar %>%
 
 ##### Select and Arrange Data ##################################################
 df_covar <- df_covar %>%
-  select(UID, AGE, AGE3, SEGSTAGE, PARITY, EDUCATION, LSI, LSI2, SEBMI, SEBMI3, 
+  select(UID, AGE, AGE3, SEGSTAGE, PARITY, EDUCATION, LSI, LSI4, SEBMI, SEBMI3, 
     medSEMUAC, PESTICIDE, PETOBAC, PEBETEL, PEHCIGAR, wAs, uAs, wAs10, uAsB)
 
 df_covar %>%

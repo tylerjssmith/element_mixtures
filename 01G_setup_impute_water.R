@@ -23,6 +23,9 @@ set.seed(7023)
 # Imputations (m)
 m <- 1
 
+# Iterations (maxiter)
+it <- 100
+
 # Predictor Matrix (predictorMatrix)
 # (Note: This ensures UID is not used for imputation.)
 tmp <- df_water_miss %>% ncol()
@@ -60,7 +63,7 @@ rm(order_water_miss)
 
 ##### Conduct Multiple Imputation ##############################################
 # Impute Data
-impt_water <- mice(df_water_miss, m = m, method = "leftcenslognorm", 
+impt_water <- mice(df_water_miss, m = m, maxit = it, method = "leftcenslognorm", 
   predictorMatrix = mice_predictors_water, lod = water_llod_mice)
 
 # Check Logged Events

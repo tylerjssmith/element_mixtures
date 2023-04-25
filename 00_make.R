@@ -39,7 +39,7 @@ source("02D_spearman.R")
 
 ##### 03 Tables and Figures ####################################################
 # Table 1-2
-# (Summary Statistics)
+# (Geometric Means)
 source("03A_tbl1.R")
 source("03B_tbl2.R")
 
@@ -48,10 +48,10 @@ source("03B_tbl2.R")
 source("03C_fig1.R")
 source("03D_fig2.R")
 
-# Figures 3-4
+# Tables 3-4
 # (Principal Component Scores)
-#source("03E_fig3.R")
-#source("03F_fig4.R")
+source("03E_tbl3.R")
+source("03F_tbl4.R")
 
 ##### 04 Supplemental Tables and Figures #######################################
 # Table S1
@@ -59,19 +59,19 @@ source("03D_fig2.R")
 source("04A_tblS1.R")
 
 # Tables S2-S3
-# (Correlation Matrices)
+# (Median [IQR])
 source("04B_tblS2.R")
 source("04C_tblS3.R")
 
 # Tables S4-S5
-# (Principal Component Loadings)
+# (Correlation Matrices)
 source("04D_tblS4.R")
 source("04E_tblS5.R")
 
 # Tables S6-S7
-# (Principal Component Scores)
-#source("04F_tblS6.R")
-#source("04G_tblS7.R")
+# (Principal Component Loadings)
+source("04F_tblS6.R")
+source("04G_tblS7.R")
 
 # Table S8
 # (Spearman's Correlations)
