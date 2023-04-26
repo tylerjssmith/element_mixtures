@@ -16,7 +16,7 @@ tbl4 <- df_tbl4 %>%
     values_from = c(estimate,conf.low,conf.high,p.value)) %>%
   select(term, ends_with("PC1"), ends_with("PC2"), ends_with("PC3"), 
     ends_with("PC4"), ends_with("PC5"), ends_with("PC6"), ends_with("PC7")) %>%
-  mutate(across(-term, ~ format(round(.x, 2), nsmall = 2))) %>%
+  mutate(across(-c(term, contains("p.value")), ~ format(round(.x, 2), nsmall = 2))) %>%
   mutate(PC1 = paste0(estimate_PC1, " (", conf.low_PC1, ", ", conf.high_PC1, ")")) %>%
   mutate(PC2 = paste0(estimate_PC2, " (", conf.low_PC2, ", ", conf.high_PC2, ")")) %>%
   mutate(PC3 = paste0(estimate_PC3, " (", conf.low_PC3, ", ", conf.high_PC3, ")")) %>%
@@ -26,6 +26,13 @@ tbl4 <- df_tbl4 %>%
   mutate(PC7 = paste0(estimate_PC7, " (", conf.low_PC7, ", ", conf.high_PC7, ")")) %>%
   select(term, PC1, p.value_PC1, PC2, p.value_PC2, PC3, p.value_PC3,  
     PC4, p.value_PC4, PC5, p.value_PC5, PC6, p.value_PC6, PC7, p.value_PC7)
+
+tbl4 <- tbl4 %>%
+  mutate(across(contains("p.value"), 
+    ~ ifelse(.x >= 0.01,                   format(round(.x, 2), nsmall = 2),
+      ifelse(.x <  0.01   & .x >= 0.001,  "<0.01",
+      ifelse(.x <  0.001  & .x >= 0.0001, "<0.001",
+      ifelse(.x < -0.0001,                "<0.0001", NA))))))
 
 tbl4 %>% head()
 tbl4 %>% dim()
