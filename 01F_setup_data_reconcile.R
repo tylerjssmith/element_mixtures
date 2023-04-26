@@ -73,7 +73,7 @@ df_covar <- left_join(included_uid, df_covar, by = "UID")
 ##### Calculate Relative Measures on Final Sample ##############################
 # Age: IQR Units
 df_covar <- df_covar %>%
-  mutate(AGEIQR = AGE / IQR(AGE, na.rm = TRUE))
+  mutate(AGEIQR = AGE / IQR(AGE))
 
 df_covar %>%
   check_continuous(

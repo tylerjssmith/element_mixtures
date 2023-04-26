@@ -21,12 +21,31 @@ df_covar %>%
   )
 
 ##### Summarize Participant Characteristics ####################################
+# Age
 df_covar %>%
   summarise(
     n = n(),
     median = median(AGE),
     q1 = quantile(AGE, 0.25),
     q3 = quantile(AGE, 0.75)
+  )
+
+# Mid-upper Arm Circumference
+df_covar %>%
+  summarise(
+    n = n(),
+    median = median(medSEMUAC),
+    q1 = quantile(medSEMUAC, 0.25),
+    q3 = quantile(medSEMUAC, 0.75)
+  )
+
+# Living Standards Index
+df_covar %>%
+  summarise(
+    n = n(),
+    median = median(LSI),
+    q1 = quantile(LSI, 0.25),
+    q3 = quantile(LSI, 0.75)
   )
 
 ##### Check Outliers: Drinking Water ###########################################
