@@ -22,6 +22,10 @@ df_water_impt_ln_z <- df_water_impt %>%
 
 df_water_impt_ln_z %>% head()
 
+# Scree Plot and Parallel Analysis
+fa.parallel(df_water_impt_ln_z, fa = "pc", nfactors = ncol(df_water_impt_ln_z), 
+  n.iter = 200)
+
 # Principal Components Analysis
 (pca_fit_water <- principal(df_water_impt_ln_z, 
   nfactors = ncol(df_water_impt_ln_z), rotate = "none"))
@@ -47,6 +51,10 @@ df_urine_impt_ln_z <- df_urine_impt %>%
   mutate(across(Al:Zn, ~ scale(.x)))
 
 df_urine_impt_ln_z %>% head()
+
+# Scree Plot and Parallel Analysis
+fa.parallel(df_urine_impt_ln_z, fa = "pc", nfactors = ncol(df_urine_impt_ln_z), 
+  n.iter = 200)
 
 # Principal Components Analysis
 (pca_fit_urine <- principal(df_urine_impt_ln_z, 
