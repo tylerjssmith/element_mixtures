@@ -8,7 +8,6 @@
 ##### Preliminaries ############################################################
 # Load Packages
 library(tidyverse)
-library(scales)
 
 ##### Extract and Prepare Loadings #############################################
 # Label Absolute Value(Loading) >0.4
