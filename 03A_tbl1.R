@@ -19,6 +19,9 @@ tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","medSEMUAC4",
 tmp_y_water <- df_tbl1 %>% select(Al:W) %>% colnames()
 
 tbl1 <- rbind(
+  # Overall
+  tibble(covar = "Overall", df_tbl1 %>% tbl_gm(x = NULL, from = Al, to = W)),
+  
   # Age
   df_tbl1 %>% tbl_gm(x = AGE3, from = Al, to = W),
   df_tbl1 %>% tbl_pval(y = tmp_y_water, x = "AGE3"),

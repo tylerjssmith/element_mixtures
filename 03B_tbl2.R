@@ -18,6 +18,9 @@ tmp_x <- c("AGE3","SEGSTAGE","PARITY","EDUCATION","LSI4","medSEMUAC4","PESTICIDE
 tmp_y_urine <- df_tbl2 %>% select(Al:Zn) %>% colnames()
 
 tbl2 <- rbind(
+  # Overall
+  tibble(covar = "Overall", df_tbl2 %>% tbl_gm(x = NULL, from = Al, to = Zn)),
+  
   # Age
   df_tbl2 %>% tbl_gm(x = AGE3, from = Al, to = Zn),
   df_tbl2 %>% tbl_pval(y = tmp_y_urine, x = "AGE3"),
