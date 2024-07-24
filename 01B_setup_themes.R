@@ -22,3 +22,7 @@ th <- theme_bw() +
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 14)
   )
+
+##### Set Options ##############################################################
+# Suppress Scientific Notation
+options(scipen = 999)
