@@ -11,7 +11,7 @@ library(tidyverse)
 library(lubridate)
 
 # Set Working Directory
-setwd("~/Johns Hopkins/PAIR Data - Documents/Data/Current/")
+setwd("~/Library/CloudStorage/OneDrive-SharedLibraries-JohnsHopkins/PAIR Data - Documents/Data/Current")
 
 ##### Read Data ################################################################
 pregtrak <- read_csv("j7pregtrak/pair_pregtrak_2022_0309.csv")
